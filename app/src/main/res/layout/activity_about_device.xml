@@ -60,161 +60,84 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingStart="20dp"
-            android:paddingTop="8dp"
+            android:paddingTop="12dp"
             android:paddingEnd="20dp"
             android:paddingBottom="24dp">
-
-            <!-- 设备 -->
-            <TextView
-                style="@style/AboutSectionHeader"
-                android:text="@string/about_section_device" />
 
             <include
                 android:id="@+id/rowManufacturer"
                 layout="@layout/item_about_row" />
 
-            <include
-                android:id="@+id/rowBrand"
-                layout="@layout/item_about_row" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
 
             <include
                 android:id="@+id/rowModel"
                 layout="@layout/item_about_row" />
 
-            <include
-                android:id="@+id/rowProduct"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowDevice"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowHardware"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowBoard"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowAbis"
-                layout="@layout/item_about_row" />
-
-            <!-- 系统 -->
-            <TextView
-                style="@style/AboutSectionHeader"
-                android:text="@string/about_section_system" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
 
             <include
                 android:id="@+id/rowAndroidVersion"
                 layout="@layout/item_about_row" />
 
-            <include
-                android:id="@+id/rowSdkInt"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowCodename"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowIncremental"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowBuildId"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowFingerprint"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowLocale"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowTimezone"
-                layout="@layout/item_about_row" />
-
-            <!-- 内存与存储 -->
-            <TextView
-                style="@style/AboutSectionHeader"
-                android:text="@string/about_section_memory" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
 
             <include
                 android:id="@+id/rowTotalMem"
                 layout="@layout/item_about_row" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
+
             <include
                 android:id="@+id/rowAvailMem"
                 layout="@layout/item_about_row" />
 
-            <include
-                android:id="@+id/rowLowMem"
-                layout="@layout/item_about_row" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
 
             <include
                 android:id="@+id/rowTotalStorage"
                 layout="@layout/item_about_row" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
+
             <include
                 android:id="@+id/rowAvailStorage"
                 layout="@layout/item_about_row" />
 
-            <!-- 屏幕 -->
-            <TextView
-                style="@style/AboutSectionHeader"
-                android:text="@string/about_section_display" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
 
             <include
                 android:id="@+id/rowResolution"
                 layout="@layout/item_about_row" />
 
-            <include
-                android:id="@+id/rowScreenSize"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowScreenDensity"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowRefreshRate"
-                layout="@layout/item_about_row" />
-
-            <!-- 应用 -->
-            <TextView
-                style="@style/AboutSectionHeader"
-                android:text="@string/about_section_app" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/ai_sidebar_divider" />
 
             <include
                 android:id="@+id/rowAppVersion"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowVersionCode"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowTargetSdk"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowMinSdk"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowPackage"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowFirstInstall"
-                layout="@layout/item_about_row" />
-
-            <include
-                android:id="@+id/rowLastUpdate"
                 layout="@layout/item_about_row" />
 
         </LinearLayout>

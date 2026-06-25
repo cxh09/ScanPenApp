@@ -144,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
         })
 
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.Theme_ScanPenApp_Dialog)
             .setTitle(titleRes)
             .setView(dialogBinding.root)
             .setPositiveButton(R.string.settings_dialog_ok, null)
