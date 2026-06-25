@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_contact_item"
+    android:gravity="center_vertical"
+    android:minHeight="64dp"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="10dp">
+
+    <View
+        android:id="@+id/vContactAvatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_avatar" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvContactName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/chat_text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="欣航IT学习之路群" />
+
+            <TextView
+                android:id="@+id/tvContactTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textColor="@color/chat_text_tertiary"
+                android:textSize="11sp"
+                tools:text="08:54" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvContactPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/chat_text_secondary"
+            android:textSize="12sp"
+            tools:text="母老虎: 谢谢刘老师🥰" />
+    </LinearLayout>
+
+</LinearLayout>

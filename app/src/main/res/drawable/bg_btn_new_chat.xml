@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  「开启新对话」按钮背景：深色模式下的圆角 pill 样式。
+  - 静态填充使用 ai_sidebar_hover（接近纯黑的中性灰），与侧边栏背景区分开。
+  - 圆角半径 24dp，呈现 pill 形状。
+  - 嵌套 ripple：保留点击反馈，ripple mask 也使用相同的圆角，避免按下时露出直角。
+  - 通过 <inset> 让圆角背景比按钮本身小一圈：按钮的可点击区域（含 ripple 反馈）
+    比视觉 pill 略大，圆角与按钮边缘、与侧边栏的分割线/屏幕外缘都保留呼吸空间。
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="6dp"
+    android:insetRight="6dp"
+    android:insetTop="4dp"
+    android:insetBottom="4dp">
+    <ripple android:color="?attr/colorControlHighlight">
+        <item android:id="@android:id/mask">
+            <shape android:shape="rectangle">
+                <solid android:color="#FFFFFF" />
+                <corners android:radius="24dp" />
+            </shape>
+        </item>
+        <item>
+            <shape android:shape="rectangle">
+                <solid android:color="@color/ai_sidebar_hover" />
+                <corners android:radius="24dp" />
+            </shape>
+        </item>
+    </ripple>
+</inset>

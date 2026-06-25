@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="20"
+    android:viewportHeight="20"
+    android:tint="@color/chat_text_secondary">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M9.4,8.6L15.7,2.3L17.7,4.3L11.4,10.6L17.7,16.9L15.7,18.9L9.4,12.6L3.1,18.9L1.1,16.9L7.4,10.6L1.1,4.3L3.1,2.3L9.4,8.6ZM6,4.5C5.2,4.5 4.5,5.2 4.5,6C4.5,6.8 5.2,7.5 6,7.5C6.8,7.5 7.5,6.8 7.5,6C7.5,5.2 6.8,4.5 6,4.5ZM6,12.5C5.2,12.5 4.5,13.2 4.5,14C4.5,14.8 5.2,15.5 6,15.5C6.8,15.5 7.5,14.8 7.5,14C7.5,13.2 6.8,12.5 6,12.5Z" />
+</vector>

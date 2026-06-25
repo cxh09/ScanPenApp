@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ScanPenApp">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".AskAiActivity"
+            android:exported="false"
+            android:label="@string/title_ask_ai"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".MicroChatActivity"
+            android:exported="false"
+            android:label="@string/title_micro_chat"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_settings"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".AboutDeviceActivity"
+            android:exported="false"
+            android:label="@string/about_title"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".ai.AiSettingsActivity"
+            android:exported="false"
+            android:label="@string/ai_settings_title"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".ai.QrScanActivity"
+            android:exported="false"
+            android:label="@string/qr_scan_title"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".ai.QrShareActivity"
+            android:exported="false"
+            android:label="@string/qr_share_title"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".ai.QrPreviewActivity"
+            android:exported="false"
+            android:label="@string/qr_preview_title"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+
+    </application>
+
+</manifest>

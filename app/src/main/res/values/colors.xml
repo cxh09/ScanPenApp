@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- 问 AI 页面专用色板（深色模式：纯黑背景 + 灰色交互区域） -->
+    <color name="ai_sidebar_bg">#0A0A0A</color>
+    <color name="ai_sidebar_divider">#1A1A1A</color>
+    <color name="ai_sidebar_hover">#1A1A1A</color>
+    <color name="ai_sidebar_active">#2A2A2A</color>
+    <color name="ai_chat_bg">#000000</color>
+    <color name="ai_text_primary">#E8E8ED</color>
+    <color name="ai_text_secondary">#8E8E93</color>
+    <color name="ai_text_tertiary">#5A5A5E</color>
+    <color name="ai_input_bg">#1C1C1E</color>
+    <color name="ai_input_border">#2C2C2E</color>
+    <color name="ai_input_focus_border">#3B82F6</color>
+    <color name="ai_send_bg">#E8E8ED</color>
+    <color name="ai_send_icon">#000000</color>
+    <color name="ai_kbd_hint_bg">#2C2C2E</color>
+    <color name="ai_avatar_bg">#4A7BA8</color>
+    <color name="ai_msg_user_bg">#2A2A2E</color>
+    <color name="ai_msg_user_text">#E8E8ED</color>
+    <color name="ai_msg_ai_bg">#1C1C1E</color>
+    <color name="ai_msg_ai_text">#D1D1D6</color>
+    <color name="ai_msg_role">#636366</color>
+    <color name="ai_status_warn">#F59E0B</color>
+    <color name="ai_history_selected">#2A2A2A</color>
+
+    <!-- 微聊页面专用色板（深色模式：纯黑背景 + 中性灰交互 + 浅色文字） -->
+    <color name="chat_bg">#000000</color>
+    <color name="chat_sidebar_bg">#0A0A0A</color>
+    <color name="chat_sidebar_divider">#1A1A1A</color>
+    <color name="chat_sidebar_hover">#1A1A1A</color>
+    <color name="chat_sidebar_active">#2A2A2A</color>
+    <color name="chat_sidebar_active_text">#E8E8ED</color>
+    <color name="chat_bubble_mine">#2A2A2E</color>
+    <color name="chat_bubble_other">#1C1C1E</color>
+    <color name="chat_text_primary">#E8E8ED</color>
+    <color name="chat_text_secondary">#8E8E93</color>
+    <color name="chat_text_tertiary">#5A5A5E</color>
+    <color name="chat_input_bg">#1C1C1E</color>
+    <color name="chat_input_border">#2C2C2E</color>
+    <color name="chat_send_bg">#E8E8ED</color>
+    <color name="chat_send_text">#000000</color>
+    <color name="chat_bubble_text">#E8E8ED</color>
+
+    <!-- 设置页专用色板 -->
+    <color name="settings_item_bg">#0A0A0A</color>
+    <color name="settings_item_ripple">#1A1A1A</color>
+</resources>

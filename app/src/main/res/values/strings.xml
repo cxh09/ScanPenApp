@@ -1,0 +1,168 @@
+<resources>
+    <string name="app_name">ScanPenApp</string>
+    <string name="main_subtitle">智能扫描 · 随身助手</string>
+    <string name="btn_ask_ai">问 AI</string>
+    <string name="btn_micro_chat">微聊</string>
+    <string name="title_ask_ai">问 AI</string>
+    <string name="title_micro_chat">微聊</string>
+
+    <!-- 问 AI 页面 -->
+    <string name="ai_search_hint">搜索…</string>
+    <string name="ai_new_chat">新对话</string>
+    <string name="ai_history_title">历史对话</string>
+    <string name="ai_history_title_format">%1$s</string>
+    <string name="ai_subtitle_ai_generated">AI 生成可能存在误校文</string>
+    <string name="ai_greeting">有什么我能帮你的吗？</string>
+    <string name="ai_input_hint">发消息…</string>
+    <string name="ai_quick_action">快速</string>
+    <string name="ai_thinking">思考</string>
+    <string name="ai_send_voice">语音输入</string>
+
+    <!-- 问 AI：API 设置 -->
+    <string name="ai_settings_title">AI 服务设置</string>
+    <string name="ai_settings_back">← 返回</string>
+    <string name="ai_settings_subtitle">请先填写 API 信息，再开始对话</string>
+    <string name="ai_settings_entry">设置</string>
+    <string name="ai_settings_api_key_hint">API Key</string>
+    <string name="ai_settings_base_url_hint">Base URL（可选，留空使用官方）</string>
+    <string name="ai_settings_preset_title">预设：</string>
+    <string name="ai_settings_preset_deepseek">DeepSeek</string>
+    <string name="ai_settings_preset_opencode">OpenCode</string>
+    <string name="ai_settings_preset_glm">GLM(免费)</string>
+    <string name="ai_settings_model_hint">模型（如 gpt-4o-mini）</string>
+    <string name="ai_settings_test">测试连接</string>
+    <string name="ai_settings_save">保存</string>
+    <string name="ai_settings_cancel">取消</string>
+    <string name="ai_settings_required">API Key 与 Model 不能为空</string>
+    <string name="ai_settings_testing">测试中…</string>
+    <string name="ai_settings_test_ok">连接成功</string>
+    <string name="ai_settings_test_fail">连接失败：%1$s</string>
+    <string name="ai_settings_saved">已保存</string>
+    <string name="ai_settings_status_unset">未配置 API</string>
+    <string name="ai_settings_status_set">已配置：%1$s</string>
+    <string name="ai_settings_scan">扫一扫</string>
+    <string name="ai_settings_share">分享</string>
+    <string name="ai_settings_scan_filled">已从二维码填入</string>
+    <string name="ai_settings_scan_invalid">二维码内容无效</string>
+
+    <!-- 二维码扫描页 -->
+    <string name="qr_scan_title">扫描二维码</string>
+    <string name="qr_scan_back">← 返回</string>
+    <string name="qr_scan_hint">将二维码对准扫描框</string>
+    <string name="qr_scan_cancel">取消</string>
+    <string name="qr_scan_permission_title">需要相机权限</string>
+    <string name="qr_scan_permission_rationale">扫码功能需要使用相机拍摄二维码，请在接下来弹出的系统对话框中允许"相机"权限。</string>
+    <string name="qr_scan_permission_denied_desc">扫码需要相机权限，但你刚才拒绝了授权。</string>
+    <string name="qr_scan_permission_blocked_desc">相机权限已被禁用，请到系统设置 → 应用权限中手动开启相机权限。</string>
+    <string name="qr_scan_permission_grant">授予权限</string>
+    <string name="qr_scan_permission_open_settings">前往设置</string>
+
+    <!-- 二维码分享页 -->
+    <string name="qr_share_title">分享配置</string>
+    <string name="qr_share_back">← 返回</string>
+    <string name="qr_share_hint">用另一台设备扫描下方二维码即可导入配置</string>
+    <string name="qr_share_empty">尚未配置任何信息</string>
+    <string name="qr_share_summary_key">Key：%1$s</string>
+    <string name="qr_share_summary_url">URL：%1$s</string>
+    <string name="qr_share_summary_model">Model：%1$s</string>
+
+    <!-- 二维码全屏预览 -->
+    <string name="qr_preview_title">二维码预览</string>
+    <string name="qr_preview_dismiss_hint">点击任意位置关闭</string>
+
+    <!-- 问 AI：聊天消息 -->
+    <string name="ai_msg_you">你</string>
+    <string name="ai_msg_ai">AI</string>
+    <string name="ai_msg_thinking">正在思考…</string>
+    <string name="ai_msg_empty">请先在上方设置中填写 API 信息</string>
+    <string name="ai_error_no_config">尚未配置 API，请先填写</string>
+    <string name="ai_error_send_fail">发送失败：%1$s</string>
+
+    <!-- 问 AI：历史对话长按删除 -->
+    <string name="ai_history_delete_title">删除对话</string>
+    <string name="ai_history_delete_message">确定要删除这条对话吗？</string>
+    <string name="ai_history_delete_confirm">删除</string>
+    <string name="ai_history_delete_cancel">取消</string>
+
+    <!-- 微聊页面 -->
+    <string name="chat_search_hint">搜索</string>
+    <string name="chat_empty_hint">点击右上角 + 开始新对话</string>
+
+    <!-- 微聊：右侧会话标题与操作 -->
+    <string name="chat_action_emoji">表情</string>
+    <string name="chat_action_call">语音通话</string>
+    <string name="chat_action_more">更多</string>
+    <string name="chat_action_new_chat">新建对话</string>
+    <string name="chat_action_send">发送</string>
+    <string name="chat_input_hint">输入消息…</string>
+
+    <!-- 设置页 -->
+    <string name="btn_settings">设置</string>
+    <string name="title_settings">设置</string>
+    <string name="settings_item_wifi">WiFi</string>
+    <string name="settings_item_bluetooth">蓝牙</string>
+    <string name="settings_item_brightness">亮度</string>
+    <string name="settings_item_volume">声音</string>
+    <string name="settings_item_language">语言</string>
+    <string name="settings_item_about">关于本机</string>
+    <string name="settings_item_placeholder">该功能为占位演示</string>
+
+    <!-- 关于本机 -->
+    <string name="about_title">关于本机</string>
+    <string name="about_section_device">设备</string>
+    <string name="about_section_system">系统</string>
+    <string name="about_section_memory">内存与存储</string>
+    <string name="about_section_display">屏幕</string>
+    <string name="about_section_app">应用</string>
+    <string name="about_label_manufacturer">厂商</string>
+    <string name="about_label_brand">品牌</string>
+    <string name="about_label_model">型号</string>
+    <string name="about_label_product">产品</string>
+    <string name="about_label_device">设备</string>
+    <string name="about_label_hardware">硬件</string>
+    <string name="about_label_board">主板</string>
+    <string name="about_label_android_version">Android 版本</string>
+    <string name="about_label_sdk_int">SDK 版本</string>
+    <string name="about_label_codename">代号</string>
+    <string name="about_label_incremental">增量版本</string>
+    <string name="about_label_build_id">Build ID</string>
+    <string name="about_label_fingerprint">指纹</string>
+    <string name="about_label_abis">CPU 架构</string>
+    <string name="about_label_total_mem">总内存</string>
+    <string name="about_label_avail_mem">可用内存</string>
+    <string name="about_label_low_mem">低内存</string>
+    <string name="about_label_total_storage">总存储</string>
+    <string name="about_label_avail_storage">可用存储</string>
+    <string name="about_label_screen_size">屏幕尺寸</string>
+    <string name="about_label_screen_density">屏幕密度</string>
+    <string name="about_label_resolution">分辨率</string>
+    <string name="about_label_refresh_rate">刷新率</string>
+    <string name="about_label_locale">语言区域</string>
+    <string name="about_label_timezone">时区</string>
+    <string name="about_label_app_version">应用版本</string>
+    <string name="about_label_version_code">版本号</string>
+    <string name="about_label_target_sdk">目标 SDK</string>
+    <string name="about_label_min_sdk">最低 SDK</string>
+    <string name="about_label_package">包名</string>
+    <string name="about_label_first_install">首次安装</string>
+    <string name="about_label_last_update">最后更新</string>
+    <string name="about_value_unknown">—</string>
+    <string name="about_size_bytes">%1$s B</string>
+    <string name="about_size_kb">%1$s KB</string>
+    <string name="about_size_mb">%1$s MB</string>
+    <string name="about_size_gb">%1$s GB</string>
+    <string name="about_size_tb">%1$s TB</string>
+    <string name="about_density_xxxhdpi">xxxhdpi</string>
+    <string name="about_density_xxhdpi">xxhdpi</string>
+    <string name="about_density_xhdpi">xhdpi</string>
+    <string name="about_density_hdpi">hdpi</string>
+    <string name="about_density_mdpi">mdpi</string>
+    <string name="about_density_ldpi">ldpi</string>
+    <string name="about_density_tvdpi">tvdpi</string>
+    <string name="about_density_custom">dpi %1$d</string>
+    <string name="about_density_unknown">未知</string>
+    <string name="settings_dialog_brightness_title">亮度</string>
+    <string name="settings_dialog_volume_title">声音</string>
+    <string name="settings_dialog_ok">完成</string>
+    <string name="settings_value_percent">%1$d%%</string>
+</resources>

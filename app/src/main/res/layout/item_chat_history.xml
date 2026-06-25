@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  历史对话列表项布局。
+  - 根布局的 layout_margin* 与「新对话」按钮保持一致（左右 16dp），圆角背景与侧边栏边缘呼吸空间相同。
+  - 默认背景为 @drawable/bg_history_normal：圆角 + ripple，视觉风格与新对话按钮同款。
+  - 选中态由 Adapter 在 getView 中覆盖为 @drawable/bg_history_selected（颜色更深一档）。
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="2dp"
+    android:background="@drawable/bg_history_normal"
+    android:minHeight="48dp"
+    android:paddingStart="12dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/ivHistoryIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_chat_bubble"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvHistoryTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/ai_text_primary"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ivHistoryStar"
+        app:layout_constraintStart_toEndOf="@id/ivHistoryIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="历史对话标题" />
+
+    <ImageView
+        android:id="@+id/ivHistoryStar"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_star"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  历史对话列表项选中态背景：与未选中态同款形状，颜色更深一档。
+  - 静态填充使用 ai_history_selected（比 ai_sidebar_hover 略亮的中性灰），
+    在纯黑侧边栏上有清晰但不刺眼的对比。
+  - 圆角 12dp，与 bg_history_normal 保持一致，仅靠颜色区分选中态。
+  - 通过 <inset> 让圆角比 item 本身小一圈，与未选中态保持相同的视觉外边距。
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="6dp"
+    android:insetRight="6dp"
+    android:insetTop="4dp"
+    android:insetBottom="4dp">
+    <shape android:shape="rectangle">
+        <solid android:color="@color/ai_history_selected" />
+        <corners android:radius="12dp" />
+    </shape>
+</inset>
