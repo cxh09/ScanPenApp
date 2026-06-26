@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    问 AI 页面右侧抽屉：模型选择列表项。
+    - 比设置页列表项更紧凑：单行 name + model 副标 + 右侧打勾标记。
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="12dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="2dp"
+    android:background="@drawable/bg_history_normal"
+    android:minHeight="56dp"
+    android:paddingStart="12dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:id="@+id/tvDrawerModelName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/ai_text_primary"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@id/ivDrawerChecked"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="GPT-4o" />
+
+    <TextView
+        android:id="@+id/tvDrawerModelSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/ai_text_tertiary"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toStartOf="@id/ivDrawerChecked"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvDrawerModelName"
+        tools:text="gpt-4o-mini" />
+
+    <ImageView
+        android:id="@+id/ivDrawerChecked"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:contentDescription="@string/ai_model_checked"
+        android:src="@drawable/ic_chevron_right"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/ai_input_focus_border"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

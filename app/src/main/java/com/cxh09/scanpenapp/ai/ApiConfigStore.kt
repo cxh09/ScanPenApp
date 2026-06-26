@@ -1,43 +1,49 @@
 package com.cxh09.scanpenapp.ai
 
 import android.content.Context
-import android.content.SharedPreferences
 
 /**
- * [ApiConfig] 的轻量持久化。基于平台 [SharedPreferences]，不引第三方库。
+ * 旧 [ApiConfig] 的薄壳代理：实际数据已迁移到 [ModelConfigStore]（多套配置），
+ * 旧调用方（[OpenAiClientHolder] / 发送路径 / 旧的单条设置页）通过本类继续以
+ * "单条 ApiConfig" 形态读写，**始终代表当前选中那条**模型配置。
  *
- * - API Key 写入设备本地 SharedPreferences（词典笔为个人设备，未做额外加密）。
- * - 数据读取在主线程进行（仅少量字段），写入在调用方所在线程完成。
+ * ### 写入
+ * - [save] 会把传入的 4 字段合并到当前选中的 [ModelConfig]（保留 id / name）后回写。
+ * - [clear] 不建议使用；保留以兼容旧 API，内部等价于「重置为占位」。
+ *
+ * ### 读取
+ * - [load] 直接返回当前选中那条 [ModelConfig] 转出的 [ApiConfig]。
+ *
+ * 不引第三方库；底层走 [ModelConfigStore]。
  */
 class ApiConfigStore(context: Context) {
 
-    private val prefs: SharedPreferences =
-        context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val appContext: Context = context.applicationContext
+    private val modelStore: ModelConfigStore = ModelConfigStore(context)
 
-    fun load(): ApiConfig {
-        val key = prefs.getString(KEY_API_KEY, "").orEmpty()
-        val host = prefs.getString(KEY_BASE_URL, "").orEmpty()
-        val model = prefs.getString(KEY_MODEL, DEFAULT_MODEL).orEmpty()
-        return ApiConfig(apiKey = key, baseUrl = host, model = model)
-    }
+    fun load(): ApiConfig = modelStore.current().toApiConfig()
 
     fun save(config: ApiConfig) {
-        prefs.edit()
-            .putString(KEY_API_KEY, config.apiKey.trim())
-            .putString(KEY_BASE_URL, config.baseUrl.trim())
-            .putString(KEY_MODEL, config.model.trim())
-            .apply()
+        modelStore.updateCurrent { it.copy(
+            apiKey = config.apiKey,
+            baseUrl = config.baseUrl,
+            model = config.model,
+            thinkingMode = config.thinkingMode,
+        ) }
     }
 
     fun clear() {
-        prefs.edit().clear().apply()
+        // 清空整张表，重新触发 loadAll() 的兜底占位逻辑
+        prefs().edit()
+            .remove("models_json")
+            .remove("current_model_id")
+            .apply()
+        modelStore.loadAll()
     }
+
+    private fun prefs() = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private companion object {
         const val PREFS_NAME = "ai_api_config"
-        const val KEY_API_KEY = "api_key"
-        const val KEY_BASE_URL = "base_url"
-        const val KEY_MODEL = "model"
-        const val DEFAULT_MODEL = "gpt-4o-mini"
     }
 }

@@ -22,7 +22,7 @@
     <string name="ai_settings_title">AI 服务设置</string>
     <string name="ai_settings_back">← 返回</string>
     <string name="ai_settings_subtitle">请先填写 API 信息，再开始对话</string>
-    <string name="ai_settings_entry">设置</string>
+    <string name="ai_settings_entry">API 设置</string>
     <string name="ai_settings_api_key_hint">API Key</string>
     <string name="ai_settings_base_url_hint">Base URL（可选，留空使用官方）</string>
     <string name="ai_settings_preset_title">预设：</string>
@@ -44,6 +44,29 @@
     <string name="ai_settings_share">分享</string>
     <string name="ai_settings_scan_filled">已从二维码填入</string>
     <string name="ai_settings_scan_invalid">二维码内容无效</string>
+
+    <!-- 问 AI：多模型配置页 -->
+    <string name="ai_settings_models_title">AI 服务</string>
+    <string name="ai_settings_add_model">+ 新建配置</string>
+    <string name="ai_settings_model_default_name">默认</string>
+    <string name="ai_settings_model_untitled">未命名</string>
+    <string name="ai_settings_model_unconfigured">（未配置）</string>
+    <string name="ai_settings_model_delete_title">删除配置</string>
+    <string name="ai_settings_model_delete_message">确定要删除「%1$s」吗？</string>
+    <string name="ai_settings_model_delete_confirm">删除</string>
+    <string name="ai_settings_model_delete_cancel">取消</string>
+    <string name="ai_settings_edit_title">编辑配置</string>
+    <string name="ai_settings_name_hint">配置名称（如 GPT-4o）</string>
+    <string name="ai_settings_delete_model">删除此配置</string>
+    <string name="ai_settings_no_selection">请在左侧选择或新建一个配置</string>
+
+    <!-- 问 AI：抽屉选模型 -->
+    <string name="ai_model_select_title">选择模型</string>
+    <string name="ai_model_select_close">关闭</string>
+    <string name="ai_model_select_empty">还没有配置任何模型，请前往 AI 服务</string>
+    <string name="ai_model_select_goto_settings">前往 AI 服务</string>
+    <string name="ai_model_select_default">选择模型</string>
+    <string name="ai_model_checked">已选中</string>
 
     <!-- 二维码扫描页 -->
     <string name="qr_scan_title">扫描二维码</string>
@@ -99,6 +122,7 @@
     <!-- 设置页 -->
     <string name="btn_settings">设置</string>
     <string name="title_settings">设置</string>
+    <string name="btn_about_device">关于本机</string>
     <string name="settings_item_wifi">WiFi</string>
     <string name="settings_item_bluetooth">蓝牙</string>
     <string name="settings_item_brightness">亮度</string>
@@ -124,8 +148,7 @@
     <string name="about_size_mb">%1$s MB</string>
     <string name="about_size_gb">%1$s GB</string>
     <string name="about_size_tb">%1$s TB</string>
-    <string name="settings_dialog_brightness_title">亮度</string>
-    <string name="settings_dialog_volume_title">声音</string>
-    <string name="settings_dialog_ok">完成</string>
+    <string name="settings_slider_brightness_title">亮度</string>
+    <string name="settings_slider_volume_title">声音</string>
     <string name="settings_value_percent">%1$d%%</string>
 </resources>

@@ -3,6 +3,7 @@ package com.cxh09.scanpenapp.ai
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
+import com.aallam.openai.api.chat.Effort
 import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
@@ -55,7 +56,10 @@ class OpenAiClientHolder(private val configProvider: () -> ApiConfig) {
 
     /**
      * 构造一次 chat 请求（由调用方放入协程中执行）。
-     * 抽到这里仅为集中管理默认参数（model / temperature），避免在 UI 层散落硬编码。
+     * 抽到这里仅为集中管理默认参数（model / temperature / reasoning_effort），避免在 UI 层散落硬编码。
+     *
+     * - [thinkingMode] = true 时透传 `reasoning_effort = "medium"`，仅对推理类模型生效；
+     *   关闭时该字段为 `null`，请求 JSON 中不包含 `reasoning_effort` 键，对非推理模型完全兼容。
      */
     fun buildChatRequest(
         config: ApiConfig,
@@ -63,6 +67,7 @@ class OpenAiClientHolder(private val configProvider: () -> ApiConfig) {
     ): ChatCompletionRequest = ChatCompletionRequest(
         model = ModelId(config.model.trim()),
         messages = history,
+        reasoningEffort = if (config.thinkingMode) Effort("medium") else null,
         temperature = 0.7,
     )
 

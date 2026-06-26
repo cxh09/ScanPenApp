@@ -52,6 +52,11 @@
             android:screenOrientation="landscape" />
 
         <activity
+            android:name=".SettingsSliderActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name=".ai.AiSettingsActivity"
             android:exported="false"
             android:label="@string/ai_settings_title"

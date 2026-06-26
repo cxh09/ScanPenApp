@@ -3,8 +3,12 @@ package com.cxh09.scanpenapp.ai
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,20 +23,25 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.UUID
 
 /**
- * AI 服务设置页面。
+ * AI 服务设置页（左右分栏）。
  *
- * - 负责"收集 + 校验 + 持久化 ApiConfig"，通过 [ApiConfigStore] 写入 SharedPreferences。
- * - 支持扫一扫：识别到的二维码内容会被解析为 `{"key","url","model"}` 的 JSON，
- *   解析成功后自动回填到对应输入框。
- * - 保存后自动 [finish] 回到前一页，前一页 [onResume] 时从 Store 重读最新配置。
+ * - 左侧 [ModelConfigStore] 中的所有 [ModelConfig] 列表，点击切换选中。
+ * - 右侧编辑当前选中配置：`name / apiKey / baseUrl / model`，底部「保存」按当前字段回写，
+ *   底部「删除」弹确认后移除当前配置（保证列表至少留 1 条占位）。
+ * - 测试连接、扫一扫、分享、预设 BaseURL 与原单条表单一致，仅作用对象改为「当前选中配置」。
+ * - [onResume] 不主动 finish：用户可在页内继续切换 / 编辑；只有返回按钮才退出。
  */
 class AiSettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAiSettingsBinding
-    private lateinit var store: ApiConfigStore
+    private lateinit var store: ModelConfigStore
+    private lateinit var adapter: ModelConfigAdapter
     private var testingJob: Job? = null
+    /** 右栏当前显示的 id（即「正在编辑」的配置）。与 [ModelConfigStore.currentId] 解耦。 */
+    private var editingId: String? = null
 
     private val scanLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -50,10 +59,16 @@ class AiSettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
         applyFullscreen()
 
-        store = ApiConfigStore(this)
+        store = ModelConfigStore(this)
+        adapter = ModelConfigAdapter(this, ModelConfigAdapter.VARIANT_SETTINGS)
+        binding.lvModels.adapter = adapter
+        binding.lvModels.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                adapter.getItem(position)?.let(::onModelClicked)
+            }
 
-        loadConfig()
         setupListeners()
+        reloadAll()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -66,48 +81,31 @@ class AiSettingsActivity : AppCompatActivity() {
         testingJob?.cancel()
     }
 
-    private fun loadConfig() {
-        val current = store.load()
-        binding.etApiKey.setText(current.apiKey)
-        binding.etBaseUrl.setText(current.baseUrl)
-        binding.etModel.setText(
-            current.model.ifBlank { getString(R.string.ai_settings_model_hint) }
-                .takeIf { it.isNotBlank() } ?: ""
-        )
-        if (binding.etModel.text.isNullOrBlank()) {
-            binding.etModel.setText("gpt-4o-mini")
-        }
-    }
-
     private fun setupListeners() {
-        // 返回
         binding.btnBack.setOnClickListener { finish() }
 
-        // 保存
-        binding.btnSave.setOnClickListener {
-            if (validateAndSave()) {
-                finish()
-            }
-        }
+        binding.btnAddModel.setOnClickListener { addNewModel() }
 
-        // 扫一扫
+        binding.btnSave.setOnClickListener { onSaveClicked() }
+
+        binding.btnDeleteModel.setOnClickListener { onDeleteClicked() }
+
         binding.btnScan.setOnClickListener {
             scanLauncher.launch(Intent(this, QrScanActivity::class.java))
         }
 
-        // 分享
         binding.btnShare.setOnClickListener {
             startActivity(Intent(this, QrShareActivity::class.java))
         }
 
-        // Base URL 预设
+        // Base URL 预设：仅作用到当前编辑配置（写入输入框，不立即落库）
         binding.btnPresetDeepseek.setOnClickListener {
             binding.etBaseUrl.setText("https://api.deepseek.com/v1")
         }
         binding.btnPresetOpencode.setOnClickListener {
             binding.etBaseUrl.setText("https://opencode.ai/zen/go/v1")
         }
-        // 智谱 GLM 免费一键预设：填齐 Key/BaseURL/Model
+        // 智谱 GLM 免费一键预设：填齐当前编辑配置的 Key/BaseURL/Model
         binding.btnPresetGlm.setOnClickListener {
             binding.etApiKey.setText("f8be67658e91407eaf703a92e0e1e325.ULwVYUtaToi2AJj0")
             binding.etBaseUrl.setText("https://open.bigmodel.cn/api/paas/v4")
@@ -118,7 +116,13 @@ class AiSettingsActivity : AppCompatActivity() {
         // 测试连接
         binding.btnTest.setOnClickListener { runTest() }
 
-        // 键盘 ActionNext / ActionDone 跳转
+        // 输入框 IME 跳转
+        binding.etName.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                binding.etApiKey.requestFocus()
+                true
+            } else false
+        }
         binding.etApiKey.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_NEXT) {
                 binding.etBaseUrl.requestFocus()
@@ -134,24 +138,106 @@ class AiSettingsActivity : AppCompatActivity() {
     }
 
     /**
-     * 解析扫码结果，期望 JSON 形如：
-     * ```
-     * { "key": "...", "url": "...", "model": "..." }
-     * ```
-     * 任一字段不存在或为空都不会破坏既有输入。
+     * 全量重新加载：
+     * 1) 拉取 [ModelConfigStore] 列表
+     * 2) 选回 [editingId]（找不到则用当前 current）
+     * 3) 刷新右栏输入框
      */
+    private fun reloadAll() {
+        val list = store.loadAll()
+        adapter.submit(list)
+        val targetId = editingId?.takeIf { id -> list.any { it.id == id } }
+            ?: store.currentId()
+        editingId = targetId
+        adapter.setSelected(targetId)
+        renderEditor(list.first { it.id == targetId })
+    }
+
+    private fun onModelClicked(model: ModelConfig) {
+        if (model.id == editingId) return
+        editingId = model.id
+        adapter.setSelected(model.id)
+        renderEditor(model)
+    }
+
+    private fun addNewModel() {
+        val newModel = ModelConfig(
+            id = UUID.randomUUID().toString(),
+            name = getString(R.string.ai_settings_model_default_name),
+            apiKey = "",
+            baseUrl = "",
+            model = "gpt-4o-mini",
+            thinkingMode = false,
+        )
+        store.add(newModel)
+        editingId = newModel.id
+        reloadAll()
+    }
+
+    private fun onSaveClicked() {
+        val id = editingId ?: return
+        val name = binding.etName.text?.toString().orEmpty().trim()
+            .ifBlank { getString(R.string.ai_settings_model_default_name) }
+        val key = binding.etApiKey.text?.toString().orEmpty().trim()
+        val host = binding.etBaseUrl.text?.toString().orEmpty().trim()
+        val model = binding.etModel.text?.toString().orEmpty().trim()
+        if (key.isEmpty() || model.isEmpty()) {
+            binding.tvTestStatus.setText(R.string.ai_settings_required)
+            return
+        }
+        store.updateById(id) {
+            it.copy(
+                name = name,
+                apiKey = key,
+                baseUrl = host,
+                model = model,
+            )
+        }
+        Toast.makeText(this, R.string.ai_settings_saved, Toast.LENGTH_SHORT).show()
+        reloadAll()
+    }
+
+    private fun onDeleteClicked() {
+        val id = editingId ?: return
+        val list = store.loadAll()
+        val target = list.firstOrNull { it.id == id } ?: return
+        AlertDialog.Builder(this, R.style.Theme_ScanPenApp_AlertDialog_Dark)
+            .setTitle(R.string.ai_settings_model_delete_title)
+            .setMessage(getString(R.string.ai_settings_model_delete_message, target.name))
+            .setPositiveButton(R.string.ai_settings_model_delete_confirm) { _, _ ->
+                store.delete(id)
+                editingId = null
+                reloadAll()
+            }
+            .setNegativeButton(R.string.ai_settings_model_delete_cancel, null)
+            .show()
+    }
+
+    private fun renderEditor(model: ModelConfig) {
+        binding.tvEditTitle.text = model.name.ifBlank {
+            getString(R.string.ai_settings_model_default_name)
+        }
+        binding.etName.setText(model.name)
+        binding.etApiKey.setText(model.apiKey)
+        binding.etBaseUrl.setText(model.baseUrl)
+        binding.etModel.setText(model.model)
+        binding.tvTestStatus.text = ""
+        // 至少留 1 条时仍允许删除，store.delete 已保证兜底占位
+        binding.btnDeleteModel.visibility = View.VISIBLE
+        binding.formScroll.visibility = View.VISIBLE
+        binding.tvEmpty.visibility = View.GONE
+    }
+
     private fun applyScannedJson(raw: String) {
         try {
             val json = JSONObject(raw)
             val key = json.optString(FIELD_KEY).trim()
             val url = json.optString(FIELD_URL).trim()
             val model = json.optString(FIELD_MODEL).trim()
-
             if (key.isEmpty() && url.isEmpty() && model.isEmpty()) {
                 binding.tvTestStatus.setText(R.string.ai_settings_scan_invalid)
                 return
             }
-
             if (key.isNotEmpty()) binding.etApiKey.setText(key)
             if (url.isNotEmpty()) binding.etBaseUrl.setText(url)
             if (model.isNotEmpty()) binding.etModel.setText(model)
@@ -159,18 +245,6 @@ class AiSettingsActivity : AppCompatActivity() {
         } catch (e: JSONException) {
             binding.tvTestStatus.setText(R.string.ai_settings_scan_invalid)
         }
-    }
-
-    private fun validateAndSave(): Boolean {
-        val key = binding.etApiKey.text?.toString().orEmpty().trim()
-        val host = binding.etBaseUrl.text?.toString().orEmpty().trim()
-        val model = binding.etModel.text?.toString().orEmpty().trim()
-        if (key.isEmpty() || model.isEmpty()) {
-            binding.tvTestStatus.setText(R.string.ai_settings_required)
-            return false
-        }
-        store.save(ApiConfig(apiKey = key, baseUrl = host, model = model))
-        return true
     }
 
     private fun runTest() {
@@ -184,7 +258,12 @@ class AiSettingsActivity : AppCompatActivity() {
         testingJob?.cancel()
         binding.btnTest.isEnabled = false
         binding.tvTestStatus.text = getString(R.string.ai_settings_testing)
-        val tempConfig = ApiConfig(apiKey = key, baseUrl = host, model = model)
+        val tempConfig = ApiConfig(
+            apiKey = key,
+            baseUrl = host,
+            model = model,
+            thinkingMode = false,
+        )
         val tempHolder = OpenAiClientHolder { tempConfig }
         val openai: OpenAI = tempHolder.get()
 

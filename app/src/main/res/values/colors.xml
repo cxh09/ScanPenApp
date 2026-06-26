@@ -8,6 +8,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <!-- 灰白色板（用于 colorPrimary/Secondary，替代原紫色） -->
+    <color name="gray_white_primary">#D1D1D6</color>
+    <color name="gray_white_primary_variant">#9E9E9E</color>
+    <color name="gray_white_on_primary">#1A1A1A</color>
+    <color name="gray_white_secondary">#9E9E9E</color>
+    <color name="gray_white_secondary_variant">#5A5A5E</color>
+    <color name="gray_white_on_secondary">#FFFFFF</color>
+
     <!-- 问 AI 页面专用色板（深色模式：纯黑背景 + 灰色交互区域） -->
     <color name="ai_sidebar_bg">#0A0A0A</color>
     <color name="ai_sidebar_divider">#1A1A1A</color>
@@ -31,6 +39,8 @@
     <color name="ai_msg_role">#636366</color>
     <color name="ai_status_warn">#F59E0B</color>
     <color name="ai_history_selected">#2A2A2A</color>
+    <!-- 长按历史删除提示等 Dialog 用的灰黑色背景 -->
+    <color name="ai_dialog_bg">#1C1C1E</color>
 
     <!-- 微聊页面专用色板（深色模式：纯黑背景 + 中性灰交互 + 浅色文字） -->
     <color name="chat_bg">#000000</color>

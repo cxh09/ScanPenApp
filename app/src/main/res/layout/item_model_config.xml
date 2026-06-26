@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AI 服务页左侧配置列表项。
+    - 风格与问 AI 页面历史对话一致：圆角背景 + 选中态更深一档。
+    - 名称 + 副标（model 或「（未配置）」）。
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="2dp"
+    android:background="@drawable/bg_history_normal"
+    android:minHeight="48dp"
+    android:paddingStart="12dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/ivModelIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_bulb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/ai_text_secondary" />
+
+    <TextView
+        android:id="@+id/tvModelName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/ai_text_primary"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@id/tvModelUnconfigured"
+        app:layout_constraintStart_toEndOf="@id/ivModelIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="GPT-4o" />
+
+    <TextView
+        android:id="@+id/tvModelSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/ai_text_tertiary"
+        android:textSize="11sp"
+        app:layout_constraintEnd_toStartOf="@id/tvModelUnconfigured"
+        app:layout_constraintStart_toEndOf="@id/ivModelIcon"
+        app:layout_constraintTop_toBottomOf="@id/tvModelName"
+        tools:text="gpt-4o-mini" />
+
+    <TextView
+        android:id="@+id/tvModelUnconfigured"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ai_settings_model_unconfigured"
+        android:textColor="@color/ai_status_warn"
+        android:textSize="11sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

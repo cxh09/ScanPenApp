@@ -8,17 +8,22 @@ import android.os.Handler
 import android.os.Looper
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
@@ -28,6 +33,9 @@ import com.cxh09.scanpenapp.ai.ApiConfigStore
 import com.cxh09.scanpenapp.ai.Conversation
 import com.cxh09.scanpenapp.ai.ConversationStore
 import com.cxh09.scanpenapp.ai.MessageRecord
+import com.cxh09.scanpenapp.ai.ModelConfig
+import com.cxh09.scanpenapp.ai.ModelConfigAdapter
+import com.cxh09.scanpenapp.ai.ModelConfigStore
 import com.cxh09.scanpenapp.ai.OpenAiClientHolder
 import com.cxh09.scanpenapp.ai.userMessage
 import com.cxh09.scanpenapp.databinding.ActivityAskAiBinding
@@ -48,6 +56,8 @@ class AskAiActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAskAiBinding
     private lateinit var historyAdapter: ChatHistoryAdapter
     private lateinit var configStore: ApiConfigStore
+    private lateinit var modelStore: ModelConfigStore
+    private lateinit var modelDrawerAdapter: ModelConfigAdapter
     private lateinit var clientHolder: OpenAiClientHolder
     private lateinit var conversationStore: ConversationStore
     private var currentConversationId: Long? = null
@@ -87,6 +97,11 @@ class AskAiActivity : AppCompatActivity() {
     /** 当前会话的消息历史（仅用于本轮 New Chat 内的多轮上下文）。 */
     private val sessionHistory: MutableList<ChatMessage> = mutableListOf()
     private var sending: Boolean = false
+    /**
+     * 思考模式本地镜像：初值在 onCreate 末尾从 [configStore] 同步，并随 [toggleThinkingMode]
+     * 持久化回 store。buildChatRequest 读的是 store 里的 [ApiConfig.thinkingMode]，
+     * 这里是 UI 状态源，保证重启 Activity 后按钮高亮与上次设置一致。
+     */
     private var thinkingMode: Boolean = false
 
     /** 左侧「历史对话」列表，运行期由用户首次发消息时追加。 */
@@ -96,6 +111,14 @@ class AskAiActivity : AppCompatActivity() {
     private var currentSessionRecorded: Boolean = false
     private val timeFormatter = SimpleDateFormat("MM/dd HH:mm", Locale.getDefault())
 
+    /** 标记历史列表是否处于滚动中（滚动状态非 IDLE，覆盖 touch-scroll / fling）。 */
+    private var historyScrolling: Boolean = false
+    /** 标记本次按下的触摸位移是否已超过 touch slop，超过即视为滚动意图，长按删除不应触发。 */
+    private var historyTouchMoved: Boolean = false
+    private var historyTouchDownX: Float = 0f
+    private var historyTouchDownY: Float = 0f
+    private val historyTouchSlop: Int by lazy { ViewConfiguration.get(this).scaledTouchSlop }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAskAiBinding.inflate(layoutInflater)
@@ -103,6 +126,7 @@ class AskAiActivity : AppCompatActivity() {
         applyFullscreen()
 
         configStore = ApiConfigStore(this)
+        modelStore = ModelConfigStore(this)
         clientHolder = OpenAiClientHolder { configStore.load() }
         conversationStore = ConversationStore(this)
         loadHistoryFromStore()
@@ -110,9 +134,13 @@ class AskAiActivity : AppCompatActivity() {
         setupHistoryList()
         setupInputBar()
         setupSettingsRow()
-        updateSettingsStatus()
+        setupModelDrawer()
+        applyModelToInputBar()
 
-        if (!configStore.load().isComplete) {
+        // 同步持久化的思考模式到 UI（按钮高亮 + 局部状态）
+        applyThinkingMode(modelStore.current().thinkingMode)
+
+        if (!modelStore.current().isComplete) {
             openSettings()
         }
     }
@@ -136,9 +164,44 @@ class AskAiActivity : AppCompatActivity() {
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 historyAdapter.getItem(position)?.let(::onHistoryClicked)
             }
-        // 长按删除：与点击事件互不干扰（ListView 会先尝试 long-click，命中后不再触发 click）
+        // 滚动期间不响应长按删除：双重保险
+        // - OnScrollListener：滚动状态非 IDLE（touch-scroll / fling）时直接拦截
+        // - OnTouchListener：跟踪 ACTION_DOWN 位置，ACTION_MOVE 超过 touch slop 即视为滚动意图
+        binding.lvHistory.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScrollStateChanged(view: AbsListView, scrollState: Int) {
+                historyScrolling = scrollState != AbsListView.OnScrollListener.SCROLL_STATE_IDLE
+            }
+            override fun onScroll(
+                view: AbsListView,
+                firstVisibleItem: Int,
+                visibleItemCount: Int,
+                totalItemCount: Int,
+            ) = Unit
+        })
+        binding.lvHistory.setOnTouchListener { _, ev ->
+            when (ev.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    historyTouchMoved = false
+                    historyTouchDownX = ev.x
+                    historyTouchDownY = ev.y
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = ev.x - historyTouchDownX
+                    val dy = ev.y - historyTouchDownY
+                    if (dx * dx + dy * dy > historyTouchSlop * historyTouchSlop) {
+                        historyTouchMoved = true
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    historyTouchMoved = false
+                }
+            }
+            false
+        }
+        // 长按删除：滚动期间 / 触摸已位移时一律不触发，避免滑动时误弹删除确认
         binding.lvHistory.onItemLongClickListener =
             AdapterView.OnItemLongClickListener { _, _, position, _ ->
+                if (historyScrolling || historyTouchMoved) return@OnItemLongClickListener false
                 historyAdapter.getItem(position)?.let(::onHistoryLongPressed)
                 true
             }
@@ -148,7 +211,8 @@ class AskAiActivity : AppCompatActivity() {
 
     private fun onHistoryLongPressed(item: ChatHistoryItem) {
         // 二次确认，避免误触清空上下文；不沿用 Toast，确认成本太低容易误删
-        AlertDialog.Builder(this)
+        // 显式套用深色 Dialog 主题，避免系统默认的浅色背景与全站深色 UI 不一致
+        AlertDialog.Builder(this, R.style.Theme_ScanPenApp_AlertDialog_Dark)
             .setTitle(R.string.ai_history_delete_title)
             .setMessage(R.string.ai_history_delete_message)
             .setPositiveButton(R.string.ai_history_delete_confirm) { _, _ -> deleteHistoryItem(item) }
@@ -183,6 +247,11 @@ class AskAiActivity : AppCompatActivity() {
     private fun setupInputBar() {
         binding.btnNewChat.setOnClickListener { startNewChat() }
         binding.btnQuick.setOnClickListener { toggleThinkingMode() }
+        binding.btnModel.setOnClickListener {
+            // 打开抽屉前刷新一次列表（用户可能刚改过配置）
+            loadModelsIntoDrawer()
+            binding.drawerRoot.openDrawer(GravityCompat.END)
+        }
         binding.etInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 onSendClicked()
@@ -195,11 +264,22 @@ class AskAiActivity : AppCompatActivity() {
     }
 
     private fun toggleThinkingMode() {
-        thinkingMode = !thinkingMode
-        binding.btnQuick.isSelected = thinkingMode
+        applyThinkingMode(!thinkingMode)
+        // 持久化到 ModelConfigStore 的当前选中配置；
+        // onSendClicked 走 configStore.load().thinkingMode 拼装请求，二者互通
+        modelStore.updateCurrent { it.copy(thinkingMode = thinkingMode) }
+    }
+
+    /**
+     * 把 [enabled] 同时反映到按钮视觉（selected + 字体加粗）和局部 [thinkingMode] 字段。
+     * 抽出来供 onCreate 初始化与 toggleThinkingMode 共用，避免两处视觉同步代码漂移。
+     */
+    private fun applyThinkingMode(enabled: Boolean) {
+        thinkingMode = enabled
+        binding.btnQuick.isSelected = enabled
         binding.btnQuick.setTypeface(
             null,
-            if (thinkingMode) Typeface.BOLD else Typeface.NORMAL,
+            if (enabled) Typeface.BOLD else Typeface.NORMAL,
         )
     }
 
@@ -211,20 +291,66 @@ class AskAiActivity : AppCompatActivity() {
         startActivity(Intent(this, AiSettingsActivity::class.java))
     }
 
+    /**
+     * 初始化右侧模型选择抽屉：
+     * - 列表 Adapter 用 [ModelConfigAdapter.VARIANT_DRAWER]（带打勾标记）
+     * - 点击列表项 → 切换 current_id → 关闭抽屉 → 重建 client → 刷新输入框按钮文案
+     * - 关闭按钮：仅关闭抽屉
+     * - 跳到设置：跳到 [AiSettingsActivity]
+     * - 抽屉默认 lockMode=locked，避免误滑
+     */
+    private fun setupModelDrawer() {
+        modelDrawerAdapter = ModelConfigAdapter(this, ModelConfigAdapter.VARIANT_DRAWER)
+        binding.lvModelsInDrawer.adapter = modelDrawerAdapter
+        binding.lvModelsInDrawer.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                modelDrawerAdapter.getItem(position)?.let(::onDrawerModelPicked)
+            }
+        binding.btnCloseDrawer.setOnClickListener {
+            binding.drawerRoot.closeDrawer(GravityCompat.END)
+        }
+        binding.btnGotoSettings.setOnClickListener {
+            binding.drawerRoot.closeDrawer(GravityCompat.END)
+            openSettings()
+        }
+        binding.drawerRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        loadModelsIntoDrawer()
+    }
+
+    private fun onDrawerModelPicked(model: ModelConfig) {
+        modelStore.setCurrent(model.id)
+        binding.drawerRoot.closeDrawer(GravityCompat.END)
+        clientHolder.rebuild()
+        applyModelToInputBar()
+    }
+
+    /** 把当前选中模型的 name 渲染到输入框 [btnModel] 按钮上。 */
+    private fun applyModelToInputBar() {
+        val current = modelStore.current()
+        binding.btnModel.text = current.name.ifBlank {
+            getString(R.string.ai_settings_model_default_name)
+        }
+    }
+
+    /** 抽屉打开前重新加载（用户可能从 AI 服务页改了配置）。 */
+    private fun loadModelsIntoDrawer() {
+        val list = modelStore.loadAll()
+        modelDrawerAdapter.submit(list)
+        modelDrawerAdapter.setSelected(modelStore.currentId())
+        // 列表空时显示空态
+        val empty = list.isEmpty()
+        binding.tvDrawerEmpty.visibility = if (empty) View.VISIBLE else View.GONE
+        binding.lvModelsInDrawer.visibility = if (empty) View.GONE else View.VISIBLE
+    }
+
     override fun onResume() {
         super.onResume()
         // 从 AiSettingsActivity 返回后重读配置并刷新客户端
-        updateSettingsStatus()
         clientHolder.rebuild()
-    }
-
-    private fun updateSettingsStatus() {
-        val config = configStore.load()
-        binding.tvSettingsStatus.text = if (config.isComplete) {
-            getString(R.string.ai_settings_status_set, config.model)
-        } else {
-            getString(R.string.ai_settings_status_unset)
-        }
+        loadModelsIntoDrawer()
+        applyModelToInputBar()
+        // 思考模式可能也被改了，同步一下按钮高亮
+        applyThinkingMode(modelStore.current().thinkingMode)
     }
 
     private fun startNewChat() {

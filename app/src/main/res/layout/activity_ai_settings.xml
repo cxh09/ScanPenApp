@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    AI 服务设置页：左侧 220dp 列表（每条模型配置），右侧 0dp 表单。
+    复用问 AI 页面侧边栏 / 列表项背景，避免新增 drawable 资源。
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ai_chat_bg"
-    android:orientation="vertical">
+    android:background="@color/ai_chat_bg">
 
-    <!-- ===== 顶部栏 ===== -->
-    <LinearLayout
-        android:id="@+id/topBar"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="12dp">
+    <!-- ============ 左侧侧边栏（220dp） ============ -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sidebar"
+        android:layout_width="220dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_sidebar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
+        <!-- 顶部栏：返回 + 标题 -->
         <TextView
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
@@ -28,37 +33,147 @@
             android:paddingEnd="12dp"
             android:text="@string/ai_settings_back"
             android:textColor="@color/ai_input_focus_border"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/tvSidebarTitle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="48dp"
             android:gravity="center"
-            android:text="@string/ai_settings_title"
+            android:text="@string/ai_settings_models_title"
             android:textColor="@color/ai_text_primary"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnBack"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 新建配置按钮 -->
+        <LinearLayout
+            android:id="@+id/btnAddModel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_btn_new_chat"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSidebarTitle">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_plus"
+                app:tint="@color/ai_text_primary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/ai_settings_add_model"
+                android:textColor="@color/ai_text_primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/sidebarDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@color/ai_sidebar_divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnAddModel" />
+
+        <!-- 配置列表 -->
+        <ListView
+            android:id="@+id/lvModels"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:divider="@null"
+            android:listSelector="?attr/selectableItemBackground"
+            android:overScrollMode="ifContentScrolls"
+            android:paddingBottom="8dp"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sidebarDivider"
+            tools:listitem="@layout/item_model_config" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 中间 1dp 分隔线 -->
+    <View
+        android:id="@+id/sidebarRightDivider"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:background="@color/ai_sidebar_divider"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sidebar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ============ 右侧主区 ============ -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/mainArea"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sidebarRightDivider"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 顶部栏：当前配置名 + 扫码 + 分享 + 保存 -->
+        <TextView
+            android:id="@+id/tvEditTitle"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/ai_settings_edit_title"
+            android:textColor="@color/ai_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/btnScan"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/btnSave"
+            android:id="@+id/btnScan"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center_vertical"
-            android:paddingStart="12dp"
+            android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:text="@string/ai_settings_save"
+            android:text="@string/ai_settings_scan"
             android:textColor="@color/ai_input_focus_border"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/btnShare"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/btnShare"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
@@ -68,243 +183,319 @@
             android:text="@string/ai_settings_share"
             android:textColor="@color/ai_input_focus_border"
             android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/btnSave"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/btnScan"
+            android:id="@+id/btnSave"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center_vertical"
             android:paddingStart="8dp"
-            android:paddingEnd="4dp"
-            android:text="@string/ai_settings_scan"
+            android:paddingEnd="16dp"
+            android:text="@string/ai_settings_save"
             android:textColor="@color/ai_input_focus_border"
             android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/ai_sidebar_divider" />
+        <View
+            android:id="@+id/mainTopDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/ai_sidebar_divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnSave" />
 
-    <!-- ===== 表单内容 ===== -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never">
+        <!-- 表单 / 空态 二选一 -->
+        <FrameLayout
+            android:id="@+id/mainContent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/btnDeleteModel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mainTopDivider">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="20dp"
-            android:paddingBottom="8dp">
-
-            <TextView
-                android:id="@+id/tvSubtitle"
+            <!-- 表单 -->
+            <ScrollView
+                android:id="@+id/formScroll"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/ai_settings_subtitle"
+                android:layout_height="match_parent"
+                android:overScrollMode="ifContentScrolls">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="8dp">
+
+                    <!-- 名称 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/ai_settings_name_hint"
+                        android:textColor="@color/ai_text_primary"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/etName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_ai_settings_field"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/ai_text_primary"
+                        android:textColorHint="@color/ai_text_tertiary"
+                        android:textSize="14sp"
+                        tools:ignore="Autofill,LabelFor" />
+
+                    <!-- API Key -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/ai_settings_api_key_hint"
+                        android:textColor="@color/ai_text_primary"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/etApiKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_ai_settings_field"
+                        android:fontFamily="monospace"
+                        android:hint="@string/ai_settings_api_key_hint"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/ai_text_primary"
+                        android:textColorHint="@color/ai_text_tertiary"
+                        android:textSize="14sp"
+                        tools:ignore="Autofill,LabelFor" />
+
+                    <!-- Base URL -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/ai_settings_base_url_hint"
+                        android:textColor="@color/ai_text_primary"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/etBaseUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_ai_settings_field"
+                        android:fontFamily="monospace"
+                        android:hint="https://api.openai.com/v1/"
+                        android:imeOptions="actionNext"
+                        android:inputType="textUri"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/ai_text_primary"
+                        android:textColorHint="@color/ai_text_tertiary"
+                        android:textSize="14sp"
+                        tools:ignore="Autofill,LabelFor" />
+
+                    <!-- 预设行 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/ai_settings_preset_title"
+                            android:textColor="@color/ai_text_tertiary"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/btnPresetDeepseek"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_ai_settings_field"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="@string/ai_settings_preset_deepseek"
+                            android:textColor="@color/ai_input_focus_border"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPresetOpencode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_ai_settings_field"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="@string/ai_settings_preset_opencode"
+                            android:textColor="@color/ai_input_focus_border"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/btnPresetGlm"
+                            android:layout_width="wrap_content"
+                            android:layout_height="26dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_ai_settings_field"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:text="@string/ai_settings_preset_glm"
+                            android:textColor="@color/ai_input_focus_border"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Model -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/ai_settings_model_hint"
+                        android:textColor="@color/ai_text_primary"
+                        android:textSize="13sp" />
+
+                    <EditText
+                        android:id="@+id/etModel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_ai_settings_field"
+                        android:fontFamily="monospace"
+                        android:hint="gpt-4o-mini"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:paddingStart="10dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/ai_text_primary"
+                        android:textColorHint="@color/ai_text_tertiary"
+                        android:textSize="14sp"
+                        tools:ignore="Autofill,LabelFor" />
+
+                    <!-- 测试行 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/btnTest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:text="@string/ai_settings_test"
+                            android:textColor="@color/ai_input_focus_border"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTestStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textColor="@color/ai_text_secondary"
+                            android:textSize="12sp"
+                            tools:text="连接成功" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </ScrollView>
+
+            <!-- 空态 -->
+            <TextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="24dp"
+                android:text="@string/ai_settings_no_selection"
                 android:textColor="@color/ai_text_secondary"
-                android:textSize="12sp" />
-
-            <!-- API Key -->
-            <TextView
-                android:id="@+id/tvLabelKey"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text="@string/ai_settings_api_key_hint"
-                android:textColor="@color/ai_text_primary"
-                android:textSize="13sp" />
-
-            <EditText
-                android:id="@+id/etApiKey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_ai_settings_field"
-                android:fontFamily="monospace"
-                android:hint="@string/ai_settings_api_key_hint"
-                android:imeOptions="actionNext"
-                android:inputType="text"
-                android:maxLines="1"
-                android:paddingStart="10dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="8dp"
-                android:textColor="@color/ai_text_primary"
-                android:textColorHint="@color/ai_text_tertiary"
                 android:textSize="14sp"
-                tools:ignore="Autofill,LabelFor" />
+                android:visibility="gone" />
 
-            <!-- Base URL -->
-            <TextView
-                android:id="@+id/tvLabelBase"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/ai_settings_base_url_hint"
-                android:textColor="@color/ai_text_primary"
-                android:textSize="13sp" />
+        </FrameLayout>
 
-            <EditText
-                android:id="@+id/etBaseUrl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_ai_settings_field"
-                android:fontFamily="monospace"
-                android:hint="https://api.openai.com/v1/"
-                android:imeOptions="actionNext"
-                android:inputType="textUri"
-                android:maxLines="1"
-                android:paddingStart="10dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="8dp"
-                android:textColor="@color/ai_text_primary"
-                android:textColorHint="@color/ai_text_tertiary"
-                android:textSize="14sp"
-                tools:ignore="Autofill,LabelFor" />
+        <!-- 底部删除按钮 -->
+        <View
+            android:id="@+id/bottomDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/ai_sidebar_divider"
+            app:layout_constraintBottom_toTopOf="@id/btnDeleteModel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <!-- Base URL 预设 -->
-            <LinearLayout
-                android:id="@+id/presetRow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+        <TextView
+            android:id="@+id/btnDeleteModel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/ai_settings_delete_model"
+            android:textColor="@color/ai_status_warn"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-                <TextView
-                    android:id="@+id/tvPresetLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/ai_settings_preset_title"
-                    android:textColor="@color/ai_text_tertiary"
-                    android:textSize="12sp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <TextView
-                    android:id="@+id/btnPresetDeepseek"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="26dp"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_ai_settings_field"
-                    android:gravity="center"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/ai_settings_preset_deepseek"
-                    android:textColor="@color/ai_input_focus_border"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/btnPresetOpencode"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="26dp"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/bg_ai_settings_field"
-                    android:gravity="center"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/ai_settings_preset_opencode"
-                    android:textColor="@color/ai_input_focus_border"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/btnPresetGlm"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="wrap_content"
-                    android:layout_height="26dp"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/bg_ai_settings_field"
-                    android:gravity="center"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="@string/ai_settings_preset_glm"
-                    android:textColor="@color/ai_input_focus_border"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Model -->
-            <TextView
-                android:id="@+id/tvLabelModel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/ai_settings_model_hint"
-                android:textColor="@color/ai_text_primary"
-                android:textSize="13sp" />
-
-            <EditText
-                android:id="@+id/etModel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/bg_ai_settings_field"
-                android:fontFamily="monospace"
-                android:hint="gpt-4o-mini"
-                android:imeOptions="actionDone"
-                android:inputType="text"
-                android:maxLines="1"
-                android:paddingStart="10dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="8dp"
-                android:textColor="@color/ai_text_primary"
-                android:textColorHint="@color/ai_text_tertiary"
-                android:textSize="14sp"
-                tools:ignore="Autofill,LabelFor" />
-
-            <!-- 测试按钮 + 状态 -->
-            <LinearLayout
-                android:id="@+id/testRow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/btnTest"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/ai_settings_test"
-                    android:textColor="@color/ai_input_focus_border"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvTestStatus"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="2"
-                    android:textColor="@color/ai_text_secondary"
-                    android:textSize="12sp"
-                    tools:text="连接成功" />
-            </LinearLayout>
-
-        </LinearLayout>
-    </ScrollView>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

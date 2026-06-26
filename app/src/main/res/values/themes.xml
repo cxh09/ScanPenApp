@@ -2,13 +2,13 @@
     <!-- Base application theme. -->
     <style name="Theme.ScanPenApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/gray_white_primary</item>
+        <item name="colorPrimaryVariant">@color/gray_white_primary_variant</item>
+        <item name="colorOnPrimary">@color/gray_white_on_primary</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/gray_white_secondary</item>
+        <item name="colorSecondaryVariant">@color/gray_white_secondary_variant</item>
+        <item name="colorOnSecondary">@color/gray_white_on_secondary</item>
         <!-- 强制全屏：隐藏状态栏与标题栏，由各 Activity 进一步隐藏导航栏 -->
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
@@ -18,18 +18,25 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <!--
-        强制深色弹窗主题：用于设置页的 SeekBar 弹窗（亮度/声音）。
-        覆盖 AppCompat AlertDialog 的窗口背景、标题与按钮文字色，避免在浅色模式下出现白底弹窗。
-    -->
-    <style name="Theme.ScanPenApp.Dialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
-        <item name="android:windowBackground">@color/ai_input_bg</item>
-        <item name="android:colorBackground">@color/ai_input_bg</item>
-        <item name="android:textColorPrimary">@color/ai_text_primary</item>
-        <item name="android:textColorSecondary">@color/ai_text_secondary</item>
+    <!-- 深色 AlertDialog：用于长按历史删除提示等场景，与全站深色 UI 对齐
+         父样式 Theme.AppCompat.Dialog.Alert 是 androidx.appcompat 提供的标准 AlertDialog 主题，
+         显式覆盖背景色与文字色即可得到深色效果，避免依赖不存在的 Material 父样式 -->
+    <style name="Theme.ScanPenApp.AlertDialog.Dark" parent="Theme.AppCompat.Dialog.Alert">
         <item name="colorAccent">@color/ai_input_focus_border</item>
-        <item name="colorControlNormal">@color/ai_text_primary</item>
-        <item name="colorControlActivated">@color/ai_input_focus_border</item>
-        <item name="colorControlHighlight">@color/ai_sidebar_active</item>
+        <item name="android:windowBackground">@color/ai_dialog_bg</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:colorBackground">@color/ai_dialog_bg</item>
+    </style>
+
+    <!-- 关于本机页面：分组标题 -->
+    <style name="AboutSectionHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">14dp</item>
+        <item name="android:textColor">@color/ai_text_tertiary</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>
