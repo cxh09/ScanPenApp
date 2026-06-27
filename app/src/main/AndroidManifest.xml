@@ -5,6 +5,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+    <!--
+        读取 MediaStore.Audio：API ≤ 32 用 READ_EXTERNAL_STORAGE；
+        API ≥ 33 (Android 13) 改用 READ_MEDIA_AUDIO，READ_EXTERNAL_STORAGE 自动失效。
+    -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
@@ -31,6 +39,13 @@
             android:name=".AskAiActivity"
             android:exported="false"
             android:label="@string/title_ask_ai"
+            android:screenOrientation="landscape" />
+
+        <!-- AI 回答全屏查看页：双击 AI 回答气泡跳转，关闭后回到 AskAiActivity -->
+        <activity
+            android:name=".AiMessageFullscreenActivity"
+            android:exported="false"
+            android:label="@string/ai_fullscreen_title"
             android:screenOrientation="landscape" />
 
         <activity
@@ -80,6 +95,32 @@
             android:label="@string/qr_preview_title"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
+
+        <activity
+            android:name=".CameraActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".RecorderActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <!--
+            FileProvider：供拍照 launcher (ActivityResultContracts.TakePicture) 写入临时照片。
+            - authority 走 ${applicationId}.fileprovider 避免与其它模块冲突。
+            - 路径在 res/xml/file_paths.xml 配置（仅暴露 cache-path "captures"）。
+            - exported=false、grantUriPermissions=true 满足系统相机写 Uri 授权需求。
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

@@ -5,6 +5,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.cxh09.scanpenapp.databinding.ActivityQrPreviewBinding
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -16,6 +19,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
  *
  * - 通过 Intent 接收原始 payload 字符串（避免 Bitmap 走 Binder 超过 1MB 上限）。
  * - 点击任意位置关闭。
+ * - 沉浸式全屏:隐藏状态栏,让二维码占满屏幕,提升识别成功率。
  * - 以更大尺寸重新渲染 QR 码（[PREVIEW_QR_SIZE_PX]），保证全屏清晰。
  */
 class QrPreviewActivity : AppCompatActivity() {
@@ -26,6 +30,8 @@ class QrPreviewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityQrPreviewBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        hideSystemBars()
 
         val payload = intent.getStringExtra(EXTRA_PAYLOAD).orEmpty()
         if (payload.isBlank()) {
@@ -42,6 +48,19 @@ class QrPreviewActivity : AppCompatActivity() {
         }
 
         binding.root.setOnClickListener { finish() }
+    }
+
+    /**
+     * 沉浸式:隐藏状态栏,内容延伸到屏幕顶部。
+     * 词典笔横屏窄长,状态栏会挤掉二维码的上下空间,全屏显示更易扫描。
+     */
+    private fun hideSystemBars() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, binding.root).apply {
+            hide(WindowInsetsCompat.Type.statusBars())
+            systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 
     private fun generateQrBitmap(content: String, size: Int): Bitmap? {

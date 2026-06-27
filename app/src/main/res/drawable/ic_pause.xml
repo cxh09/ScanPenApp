@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Lucide pause 图标：两根竖直圆角矩形。
+    - viewBox 0 0 24 24
+    - fill 由 ImageView app:tint 上色
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M14,3 h5 a1,1 0 0 1 1,1 v16 a1,1 0 0 1 -1,1 h-5 a1,1 0 0 1 -1,-1 v-16 a1,1 0 0 1 1,-1 z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M5,3 h5 a1,1 0 0 1 1,1 v16 a1,1 0 0 1 -1,1 h-5 a1,1 0 0 1 -1,-1 v-16 a1,1 0 0 1 1,-1 z" />
+</vector>

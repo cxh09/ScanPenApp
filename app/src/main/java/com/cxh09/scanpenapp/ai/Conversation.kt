@@ -5,10 +5,14 @@ package com.cxh09.scanpenapp.ai
  *
  * @param role 消息角色：「user」或「assistant」
  * @param content 消息文本内容
+ * @param reasoning 助手消息的推理过程（reasoning_content），仅 assistant 角色可能非空；
+ *                  旧版 JSON 记录无此字段时默认为 null（旧记录不可恢复推理内容）。
+ *                  与 [content] 一样是纯文本，不做 Markdown 解析。
  */
 data class MessageRecord(
     val role: String,
     val content: String,
+    val reasoning: String? = null,
 )
 
 /**

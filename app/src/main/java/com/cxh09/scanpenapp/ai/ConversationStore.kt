@@ -30,6 +30,8 @@ class ConversationStore(context: Context) {
                     put(JSONObject().apply {
                         put("role", msg.role)
                         put("content", msg.content)
+                        // reasoning 为空时不写入字段，文件体积更小；parse 端走 optString 兼容
+                        msg.reasoning?.takeIf { it.isNotEmpty() }?.let { put("reasoning", it) }
                     })
                 }
             })

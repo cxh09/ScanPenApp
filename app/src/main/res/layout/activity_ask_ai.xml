@@ -174,7 +174,7 @@
                 android:paddingTop="12dp"
                 android:paddingEnd="24dp"
                 android:paddingBottom="12dp"
-                app:layout_constraintBottom_toTopOf="@id/inputBar"
+                app:layout_constraintBottom_toTopOf="@id/attachmentPreview"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -185,6 +185,35 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
             </ScrollView>
+
+            <!--
+                附件预览行：固定 56dp 高，0 附件时 GONE，1+ 时 VISIBLE。
+                紧贴 inputBar 上方，消息区随之向上收缩。
+                内含 HorizontalScrollView → LinearLayout 横向排列 chip。
+            -->
+            <HorizontalScrollView
+                android:id="@+id/attachmentPreview"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:background="@color/ai_chat_bg"
+                android:overScrollMode="never"
+                android:scrollbars="none"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/inputBar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/attachmentChipContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="24dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="24dp"
+                    android:paddingBottom="4dp" />
+            </HorizontalScrollView>
 
             <!-- 底部输入栏：单行 输入框 | 思考 | 模型 | 加号 | 发送 -->
             <LinearLayout
@@ -382,33 +411,6 @@
                 android:textSize="13sp"
                 android:visibility="gone" />
         </FrameLayout>
-
-        <!-- 底部跳转到 AI 服务 -->
-        <LinearLayout
-            android:id="@+id/btnGotoSettings"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_key"
-                app:tint="@color/ai_text_secondary" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="@string/ai_model_select_goto_settings"
-                android:textColor="@color/ai_text_secondary"
-                android:textSize="14sp" />
-        </LinearLayout>
 
     </LinearLayout>
 

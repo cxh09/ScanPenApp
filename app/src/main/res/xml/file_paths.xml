@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    FileProvider 路径白名单。
+    - cache-path/captures/ ：AskAiActivity 拍照 launcher 写入临时 JPEG
+    - external-path/DCIM/  ：CameraActivity 保存到系统相册的照片
+    - 与 AndroidManifest.xml 中 <provider> 的 authorities 配合：
+        Uri = FileProvider.getUriForFile(ctx, "$packageName.fileprovider", file)
+-->
+<paths>
+    <cache-path
+        name="captures"
+        path="captures/" />
+    <external-path name="dcim" path="DCIM/" />
+</paths>

@@ -42,6 +42,10 @@ class AiSettingsActivity : AppCompatActivity() {
     private var testingJob: Job? = null
     /** 右栏当前显示的 id（即「正在编辑」的配置）。与 [ModelConfigStore.currentId] 解耦。 */
     private var editingId: String? = null
+    /** 是否处于「草稿」态：点了 + 但还没保存。草稿不写入 store，左侧列表也不显示。 */
+    private var isDraft: Boolean = false
+    /** 草稿态下预生成的 id；保存时把它写进 store 即可，保证新配置 id 唯一。 */
+    private var draftId: String? = null
 
     private val scanLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -154,28 +158,30 @@ class AiSettingsActivity : AppCompatActivity() {
     }
 
     private fun onModelClicked(model: ModelConfig) {
+        // 草稿态下点别的配置 → 视为放弃草稿
+        if (isDraft) {
+            isDraft = false
+            draftId = null
+        }
         if (model.id == editingId) return
         editingId = model.id
         adapter.setSelected(model.id)
         renderEditor(model)
     }
 
+    /**
+     * 进入「新建草稿」：仅清空表单 + 进入草稿态，不写 store、不动左侧列表。
+     * 真正的写入发生在 [onSaveClicked] 校验通过之后。
+     */
     private fun addNewModel() {
-        val newModel = ModelConfig(
-            id = UUID.randomUUID().toString(),
-            name = getString(R.string.ai_settings_model_default_name),
-            apiKey = "",
-            baseUrl = "",
-            model = "gpt-4o-mini",
-            thinkingMode = false,
-        )
-        store.add(newModel)
-        editingId = newModel.id
-        reloadAll()
+        isDraft = true
+        draftId = UUID.randomUUID().toString()
+        editingId = null
+        adapter.setSelected(null)
+        renderDraft()
     }
 
     private fun onSaveClicked() {
-        val id = editingId ?: return
         val name = binding.etName.text?.toString().orEmpty().trim()
             .ifBlank { getString(R.string.ai_settings_model_default_name) }
         val key = binding.etApiKey.text?.toString().orEmpty().trim()
@@ -185,19 +191,47 @@ class AiSettingsActivity : AppCompatActivity() {
             binding.tvTestStatus.setText(R.string.ai_settings_required)
             return
         }
-        store.updateById(id) {
-            it.copy(
+        if (isDraft) {
+            // 草稿落库：用预生成的 draftId 创建新配置，然后退出草稿态
+            val newId = draftId ?: UUID.randomUUID().toString()
+            val newModel = ModelConfig(
+                id = newId,
                 name = name,
                 apiKey = key,
                 baseUrl = host,
                 model = model,
+                thinkingMode = false,
             )
+            store.add(newModel)
+            isDraft = false
+            draftId = null
+            editingId = newId
+        } else {
+            val id = editingId ?: return
+            store.updateById(id) {
+                it.copy(
+                    name = name,
+                    apiKey = key,
+                    baseUrl = host,
+                    model = model,
+                )
+            }
         }
         Toast.makeText(this, R.string.ai_settings_saved, Toast.LENGTH_SHORT).show()
         reloadAll()
     }
 
     private fun onDeleteClicked() {
+        // 草稿态：删除按钮 = 放弃草稿、清空表单
+        if (isDraft) {
+            isDraft = false
+            draftId = null
+            editingId = null
+            adapter.setSelected(null)
+            // 草稿没落库，无需弹确认框，直接重置到当前已有配置
+            reloadAll()
+            return
+        }
         val id = editingId ?: return
         val list = store.loadAll()
         val target = list.firstOrNull { it.id == id } ?: return
@@ -223,6 +257,19 @@ class AiSettingsActivity : AppCompatActivity() {
         binding.etModel.setText(model.model)
         binding.tvTestStatus.text = ""
         // 至少留 1 条时仍允许删除，store.delete 已保证兜底占位
+        binding.btnDeleteModel.visibility = View.VISIBLE
+        binding.formScroll.visibility = View.VISIBLE
+        binding.tvEmpty.visibility = View.GONE
+    }
+
+    /** 草稿态：清空表单，标题写「新建配置」，删除按钮充当「放弃草稿」。 */
+    private fun renderDraft() {
+        binding.tvEditTitle.setText(R.string.ai_settings_add_model)
+        binding.etName.setText("")
+        binding.etApiKey.setText("")
+        binding.etBaseUrl.setText("")
+        binding.etModel.setText("gpt-4o-mini")
+        binding.tvTestStatus.text = ""
         binding.btnDeleteModel.visibility = View.VISIBLE
         binding.formScroll.visibility = View.VISIBLE
         binding.tvEmpty.visibility = View.GONE

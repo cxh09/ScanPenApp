@@ -27,9 +27,11 @@
         android:maxLines="1"
         android:textColor="@color/ai_text_primary"
         android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@id/tvDrawerModelSubtitle"
         app:layout_constraintEnd_toStartOf="@id/ivDrawerChecked"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="GPT-4o" />
 
     <TextView
@@ -41,6 +43,7 @@
         android:maxLines="1"
         android:textColor="@color/ai_text_tertiary"
         android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/ivDrawerChecked"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvDrawerModelName"

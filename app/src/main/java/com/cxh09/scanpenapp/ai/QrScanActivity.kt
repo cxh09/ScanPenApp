@@ -124,7 +124,7 @@ class QrScanActivity : AppCompatActivity() {
     }
 
     private fun showRationaleThenRequest() {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.Theme_ScanPenApp_AlertDialog_Dark)
             .setTitle(R.string.qr_scan_permission_title)
             .setMessage(R.string.qr_scan_permission_rationale)
             .setPositiveButton(R.string.qr_scan_permission_grant) { _, _ ->

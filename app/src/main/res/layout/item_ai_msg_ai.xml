@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    AI 消息气泡：思考过程 + 最终答案统一在一个对话框（llAiBubble）里。
+    - 外层 llAiBubble 用统一圆角背景 bg_ai_bubble，把"思考区"和"答案区"视觉上视为同一张卡片。
+    - llThinkingSection：默认 GONE；仅当模型返回 reasoning_content 时才出现。
+        - THINKING 阶段（无 answer）→ 默认展开（header "▾ 思考过程"，content 可见）
+        - ANSWERING 阶段（有 answer）→ 自动折叠（header "▸ 思考过程"，content GONE），可点击重新展开
+    - vDivider：仅当思考 + 答案都存在时显示，把两者视觉分开
+    - tvMsgContent：最终答案区；初始文字"正在思考…"作为 PENDING 阶段的占位
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,19 +25,93 @@
         android:textColor="@color/ai_msg_role"
         android:textSize="12sp" />
 
-    <TextView
-        android:id="@+id/tvMsgContent"
+    <LinearLayout
+        android:id="@+id/llAiBubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_ai_msg_ai"
+        android:background="@drawable/bg_ai_bubble"
         android:maxWidth="480dp"
+        android:orientation="vertical"
         android:paddingStart="12dp"
         android:paddingTop="8dp"
         android:paddingEnd="12dp"
-        android:paddingBottom="8dp"
-        android:textColor="@color/ai_msg_ai_text"
-        android:textIsSelectable="true"
-        android:textSize="14sp"
-        tools:text="AI 消息示例" />
+        android:paddingBottom="8dp">
 
+        <LinearLayout
+            android:id="@+id/llThinkingSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <!--
+                思考过程头部：可点击切换折叠/展开。
+                - 推理阶段（THINKING）→ 始终展开（"▾ 思考过程"）
+                - 答案阶段（ANSWERING）→ 默认折叠（"▸ 思考过程"），点击翻转
+                - 行内排布，与正文 12sp 一致，padding 收紧到 2dp，minHeight=20dp + 上下 4dp
+                  → 可点击区域 28dp，对辅助操作足够紧凑
+            -->
+            <TextView
+                android:id="@+id/tvThinkingHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:lineSpacingExtra="0dp"
+                android:minHeight="20dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="@string/ai_thinking_header_collapsed"
+                android:textColor="@color/ai_text_secondary"
+                android:textSize="12sp"
+                tools:text="▾ 思考过程" />
+
+            <!--
+                思考过程正文：纯文本流式追加，不做 Markdown 解析。
+                - 字号 12sp / 次级文字色，明显弱于最终答案。
+                - maxLines=4：推理内容即使很长也只占 4 行高度（设备横屏窄长，太多行会挤掉答案区）
+                - 完整内容仍在 TextView 内，可长按全选复制
+            -->
+            <TextView
+                android:id="@+id/tvThinkingContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lineSpacingExtra="0dp"
+                android:maxLines="4"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:textColor="@color/ai_text_secondary"
+                android:textIsSelectable="true"
+                android:textSize="12sp"
+                tools:text="思考过程示例：让我分析一下题目..." />
+        </LinearLayout>
+
+        <!--
+            思考/答案分隔线：仅在 ANSWERING 阶段（思考 + 答案都存在）显示。
+            颜色用 ai_msg_divider（弱于文字层级），仅做视觉分组。
+            上下 margin 收紧到 4dp，进一步压缩占用高度。
+        -->
+        <View
+            android:id="@+id/vDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:background="@color/ai_msg_divider"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tvMsgContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/ai_msg_ai_text"
+            android:textIsSelectable="true"
+            android:textSize="14sp"
+            tools:text="AI 消息示例" />
+    </LinearLayout>
 </LinearLayout>

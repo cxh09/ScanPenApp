@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  附件 chip 背景：与输入框 bg_input 同款暗灰（@color/ai_input_bg），圆角 4dp 偏小，
+  让 chip 在 56dp 高的预览行里看起来是「小标签」而不是「按钮」。
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/ai_input_bg" />
+    <corners android:radius="4dp" />
+</shape>

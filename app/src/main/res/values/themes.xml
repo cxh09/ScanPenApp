@@ -20,9 +20,11 @@
 
     <!-- 深色 AlertDialog：用于长按历史删除提示等场景，与全站深色 UI 对齐
          父样式 Theme.AppCompat.Dialog.Alert 是 androidx.appcompat 提供的标准 AlertDialog 主题，
-         显式覆盖背景色与文字色即可得到深色效果，避免依赖不存在的 Material 父样式 -->
+         显式覆盖背景色与文字色即可得到深色效果，避免依赖不存在的 Material 父样式。
+         按钮文字由 colorAccent 控制（正按钮）和 textColorPrimary 控制（负按钮），
+         都设为白色确保在深色背景上清晰可见。 -->
     <style name="Theme.ScanPenApp.AlertDialog.Dark" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="colorAccent">@color/ai_input_focus_border</item>
+        <item name="colorAccent">@color/white</item>
         <item name="android:windowBackground">@color/ai_dialog_bg</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColor">@color/white</item>

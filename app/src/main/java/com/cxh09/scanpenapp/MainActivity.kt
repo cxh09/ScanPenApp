@@ -30,8 +30,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        binding.btnAboutDevice.setOnClickListener {
-            startActivity(Intent(this, AboutDeviceActivity::class.java))
+        binding.btnCamera.setOnClickListener {
+            startActivity(Intent(this, CameraActivity::class.java))
+        }
+
+        binding.btnRecorder.setOnClickListener {
+            startActivity(Intent(this, RecorderActivity::class.java))
         }
     }
 

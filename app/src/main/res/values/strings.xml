@@ -3,6 +3,7 @@
     <string name="main_subtitle">智能扫描 · 随身助手</string>
     <string name="btn_ask_ai">问 AI</string>
     <string name="btn_micro_chat">微聊</string>
+    <string name="btn_about_device">关于本机</string>
     <string name="title_ask_ai">问 AI</string>
     <string name="title_micro_chat">微聊</string>
 
@@ -46,8 +47,8 @@
     <string name="ai_settings_scan_invalid">二维码内容无效</string>
 
     <!-- 问 AI：多模型配置页 -->
-    <string name="ai_settings_models_title">AI 服务</string>
-    <string name="ai_settings_add_model">+ 新建配置</string>
+    <string name="ai_settings_models_title">API管理</string>
+    <string name="ai_settings_add_model">新建配置</string>
     <string name="ai_settings_model_default_name">默认</string>
     <string name="ai_settings_model_untitled">未命名</string>
     <string name="ai_settings_model_unconfigured">（未配置）</string>
@@ -98,14 +99,31 @@
     <string name="ai_msg_ai">AI</string>
     <string name="ai_msg_thinking">正在思考…</string>
     <string name="ai_msg_empty">请先在上方设置中填写 API 信息</string>
+    <!-- 思考过程块的头部文本：▸ 收起 / ▾ 展开，箭头字符标识状态 -->
+    <string name="ai_thinking_header_collapsed">▸ 思考过程</string>
+    <string name="ai_thinking_header_expanded">▾ 思考过程</string>
     <string name="ai_error_no_config">尚未配置 API，请先填写</string>
     <string name="ai_error_send_fail">发送失败：%1$s</string>
+    <!-- AI 回答全屏查看页 -->
+    <string name="ai_fullscreen_title">AI 回答</string>
+    <string name="ai_fullscreen_back">← 返回</string>
 
     <!-- 问 AI：历史对话长按删除 -->
     <string name="ai_history_delete_title">删除对话</string>
     <string name="ai_history_delete_message">确定要删除这条对话吗？</string>
     <string name="ai_history_delete_confirm">删除</string>
     <string name="ai_history_delete_cancel">取消</string>
+
+    <!-- 问 AI：附件（图片/文件）多模态上下文 -->
+    <string name="ai_attach_pick_title">添加附件</string>
+    <string name="ai_attach_pick_image">图片</string>
+    <string name="ai_attach_pick_camera">拍照</string>
+    <string name="ai_attach_capture_fail">拍照失败</string>
+    <string name="ai_attach_pick_file">文件</string>
+    <string name="ai_attach_too_large">图片过大，无法添加</string>
+    <string name="ai_attach_read_fail">无法读取该图片</string>
+    <string name="ai_attach_not_text">仅支持文本文件</string>
+    <string name="ai_attach_truncated">已截断到 50KB</string>
 
     <!-- 微聊页面 -->
     <string name="chat_search_hint">搜索</string>
@@ -122,14 +140,10 @@
     <!-- 设置页 -->
     <string name="btn_settings">设置</string>
     <string name="title_settings">设置</string>
-    <string name="btn_about_device">关于本机</string>
-    <string name="settings_item_wifi">WiFi</string>
-    <string name="settings_item_bluetooth">蓝牙</string>
     <string name="settings_item_brightness">亮度</string>
-    <string name="settings_item_volume">声音</string>
-    <string name="settings_item_language">语言</string>
+    <string name="settings_item_volume">音量</string>
+    <string name="settings_item_api">API管理</string>
     <string name="settings_item_about">关于本机</string>
-    <string name="settings_item_placeholder">该功能为占位演示</string>
 
     <!-- 关于本机 -->
     <string name="about_title">关于本机</string>
@@ -151,4 +165,43 @@
     <string name="settings_slider_brightness_title">亮度</string>
     <string name="settings_slider_volume_title">声音</string>
     <string name="settings_value_percent">%1$d%%</string>
+
+    <!-- 主页新增：相机 / 录音机 -->
+    <string name="btn_camera">相机</string>
+    <string name="btn_recorder">录音机</string>
+    <string name="main_more_coming">更多 即将推出</string>
+
+    <!-- 相机页面 -->
+    <string name="camera_title">相机</string>
+    <string name="camera_close">关闭</string>
+    <string name="camera_switch">切换</string>
+    <string name="camera_shutter_desc">拍照</string>
+    <string name="camera_gallery">相册</string>
+    <string name="camera_permission_need">需要相机权限</string>
+    <string name="camera_permission_goto">前往设置</string>
+    <string name="camera_saved">已保存到相册</string>
+    <string name="camera_save_fail">保存失败</string>
+    <string name="camera_record_too_short">录音时间过短</string>
+
+    <!-- 录音机页面 -->
+    <string name="recorder_title">录音机</string>
+    <string name="recorder_new">新录音</string>
+    <string name="recorder_start">开始</string>
+    <string name="recorder_stop">停止</string>
+    <string name="recorder_play">播放</string>
+    <string name="recorder_pause">暂停</string>
+    <string name="recorder_resume">继续</string>
+    <string name="recorder_stop_playback">停止播放</string>
+    <string name="recorder_delete">删除</string>
+    <string name="recorder_delete_confirm">确定删除这条录音吗？</string>
+    <string name="recorder_delete_confirm_btn">删除</string>
+    <string name="recorder_delete_cancel">取消</string>
+    <string name="recorder_mic_need">需要麦克风权限</string>
+    <string name="recorder_mic_goto">前往设置</string>
+    <string name="recorder_empty">还没有录音，点击右上 ＋ 开始</string>
+    <string name="recorder_unknown_duration">--:--</string>
+    <string name="recorder_playing">正在播放…</string>
+    <string name="recorder_idle">点击下方按钮开始录音</string>
+    <string name="recorder_audio_read_need">需要访问音频文件权限</string>
+    <string name="recorder_audio_read_rationale">读取录音列表需要访问设备上的音频文件，请在系统弹窗中允许。</string>
 </resources>

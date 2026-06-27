@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AI 全屏页 ScrollView 滚动条 thumb：
+    - 颜色：ai_text_tertiary（#5A5A5E），比主文字次两级，黑底上低对比度，不抢视觉
+    - 形状：全圆角 2dp，弱化"硬边矩形"的工业感
+    - 宽度由 ScrollView 的 android:scrollbarSize 控制（这里 4dp）
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/ai_text_tertiary" />
+    <corners android:radius="2dp" />
+</shape>

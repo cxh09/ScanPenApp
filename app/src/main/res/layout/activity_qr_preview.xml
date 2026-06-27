@@ -11,24 +11,10 @@
         android:id="@+id/ivQrCode"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="16dp"
+        android:layout_margin="4dp"
         android:adjustViewBounds="true"
         android:background="#FFFFFFFF"
         android:contentDescription="@string/qr_preview_title"
-        android:padding="16dp"
+        android:padding="8dp"
         android:scaleType="fitCenter" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="20dp"
-        android:background="#80000000"
-        android:paddingStart="12dp"
-        android:paddingTop="6dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="6dp"
-        android:text="@string/qr_preview_dismiss_hint"
-        android:textColor="#E8E8ED"
-        android:textSize="12sp" />
 </FrameLayout>

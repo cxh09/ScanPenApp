@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Lucide audio-lines 图标：6 根高低不等的竖线，象征音频波形。
+    来源：lucide-react/lucide-audio-lines
+    - viewBox 0 0 24 24
+    - stroke 描边 + round 端点，由 ImageView app:tint 上色
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M2,10 v3 M6,6 v11 M10,3 v18 M14,8 v7 M18,5 v13 M22,10 v3"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+</vector>

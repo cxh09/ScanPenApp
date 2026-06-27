@@ -49,12 +49,16 @@
         android:layout_height="1dp"
         android:background="@color/ai_sidebar_divider" />
 
-    <!-- 列表 -->
+    <!-- 4 列网格 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSettings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         android:overScrollMode="always"
-        android:paddingTop="8dp" />
+        android:paddingStart="12dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="12dp" />
 
 </LinearLayout>

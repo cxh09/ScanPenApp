@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  单个附件 chip：
+  - 根 FrameLayout 48dp 高（贴齐 56dp 预览行 4dp 上下 padding），宽 56dp。
+  - 背景 @drawable/bg_attachment_chip（圆角 4dp 暗灰）。
+  - 内部三组元素通过代码按类型切换 visibility：
+      1) ImageView @id/ivThumb    40×40dp 图片缩略图（默认 gone）
+      2) LinearLayout @id/llText  文件名 + 大小（默认 gone）
+      3) ImageView @id/btnRemove  16×16dp 右上角 × 关闭（始终可见）
+  - marginEnd=8dp，让 chip 之间留间距；容器本身 padding=24dp 让首尾 chip 不贴边。
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="56dp"
+    android:layout_height="48dp"
+    android:layout_marginEnd="8dp"
+    android:background="@drawable/bg_attachment_chip">
+
+    <!-- 图片缩略图（40×40dp 居中，gasket） -->
+    <ImageView
+        android:id="@+id/ivThumb"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
+
+    <!-- 文件 chip：上下两行 名称 / 大小 -->
+    <LinearLayout
+        android:id="@+id/llText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/ai_text_primary"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tvSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/ai_text_tertiary"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- × 关闭按钮：16×16dp，右上角偏移让点击热区更大 -->
+    <ImageView
+        android:id="@+id/btnRemove"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="-2dp"
+        android:layout_marginEnd="-2dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:contentDescription="@null"
+        android:focusable="true"
+        android:padding="1dp"
+        android:src="@drawable/ic_close" />
+
+</FrameLayout>

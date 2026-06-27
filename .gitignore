@@ -21,3 +21,8 @@ replay_pid*.log
 
 # 本地构建日志
 build_log*.txt
+
+# 签名密钥（自签 release 用，勿提交）
+*.jks
+*.keystore
+keystore.properties
