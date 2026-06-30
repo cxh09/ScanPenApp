@@ -1,6 +1,5 @@
 package com.cxh09.scanpenapp.ai
 
-import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
@@ -97,10 +96,6 @@ object ApiKeyCipher {
     private fun getOrCreateKey(): SecretKey {
         val existing = getKey()
         if (existing != null) return existing
-        // KeyGenParameterSpec 需要 API 23 (M) 及以上，低版本抛错由 encrypt() 的 catch 接住并返回 null
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            throw UnsupportedOperationException("KeyGenParameterSpec requires API 23+")
-        }
         val kg = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE)
         val spec = KeyGenParameterSpec.Builder(
             KEY_ALIAS,

@@ -9,7 +9,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -135,12 +134,7 @@ class NoteListActivity : AppCompatActivity() {
                 val note = currentNote ?: return@post
                 val title = binding.etTitle.text?.toString().orEmpty()
                 val contentSpanned: Spanned = binding.etContent.text ?: SpannableString("")
-                val contentHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    Html.toHtml(contentSpanned, Html.TO_HTML_PARAGRAPH_LINES_INDIVIDUAL)
-                } else {
-                    @Suppress("DEPRECATION")
-                    Html.toHtml(contentSpanned)
-                }
+                val contentHtml = Html.toHtml(contentSpanned, Html.TO_HTML_PARAGRAPH_LINES_INDIVIDUAL)
                 val updated = note.copy(
                     title = title,
                     contentHtml = contentHtml,
@@ -202,17 +196,12 @@ class NoteListActivity : AppCompatActivity() {
         suppressTextWatcher = true
         binding.etTitle.setText(note.title)
         binding.etContent.setText(
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Html.fromHtml(
-                    note.contentHtml,
-                    Html.FROM_HTML_MODE_COMPACT,
-                    imageGetter,
-                    null
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                Html.fromHtml(note.contentHtml, imageGetter, null)
-            }
+            Html.fromHtml(
+                note.contentHtml,
+                Html.FROM_HTML_MODE_COMPACT,
+                imageGetter,
+                null
+            )
         )
         suppressTextWatcher = false
         binding.etContent.clearFocus()
@@ -539,15 +528,10 @@ class NoteListActivity : AppCompatActivity() {
             getString(R.string.note_default_title)
         }
         val contentSpanned: Spanned = binding.etContent.text ?: SpannableString("")
-        val contentHtml = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Html.toHtml(
-                contentSpanned,
-                Html.TO_HTML_PARAGRAPH_LINES_INDIVIDUAL
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            Html.toHtml(contentSpanned)
-        }
+        val contentHtml = Html.toHtml(
+            contentSpanned,
+            Html.TO_HTML_PARAGRAPH_LINES_INDIVIDUAL
+        )
         val updated = note.copy(title = title, contentHtml = contentHtml)
         lifecycleScope.launch {
             val ok = withContext(Dispatchers.IO) { store.updateNote(updated) }

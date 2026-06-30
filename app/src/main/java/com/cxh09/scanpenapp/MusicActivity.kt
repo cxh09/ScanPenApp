@@ -519,9 +519,7 @@ class MusicActivity : AppCompatActivity(), MusicPlayer.Listener {
     private fun setDefaultAccountIcon() {
         binding.ivAccount.setImageResource(R.drawable.ic_account)
         binding.ivAccount.imageTintList =
-            android.content.res.ColorStateList.valueOf(
-                androidx.core.content.ContextCompat.getColor(this, R.color.recorder_text_primary)
-            )
+            android.content.res.ColorStateList.valueOf(getColor(R.color.recorder_text_primary))
         binding.ivAccount.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
         binding.ivAccount.background = null
     }
