@@ -80,6 +80,7 @@ class RecorderActivity : AppCompatActivity() {
         binding.rvRecordings.adapter = adapter
 
         binding.btnNewRecording.setOnClickListener { switchToRecordPanel() }
+        binding.btnRecorderBack.setOnClickListener { finish() }
         binding.btnRecord.setOnClickListener { onRecordBtnClicked() }
         binding.btnPlayPause.setOnClickListener { onPlayPauseClicked() }
         binding.btnDelete.setOnClickListener { confirmDelete() }

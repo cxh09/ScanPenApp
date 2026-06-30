@@ -1,5 +1,8 @@
 package com.cxh09.scanpenapp
 
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -29,11 +32,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import androidx.core.view.GravityCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
@@ -44,19 +45,24 @@ import com.cxh09.scanpenapp.ai.AiSettingsActivity
 import com.cxh09.scanpenapp.ai.ApiConfig
 import com.cxh09.scanpenapp.ai.ApiConfigStore
 import com.cxh09.scanpenapp.ai.Attachment
+import com.cxh09.scanpenapp.ai.Bookmark
+import com.cxh09.scanpenapp.ai.BookmarkStore
 import com.cxh09.scanpenapp.ai.Conversation
 import com.cxh09.scanpenapp.ai.ConversationStore
 import com.cxh09.scanpenapp.ai.MessageRecord
-import com.cxh09.scanpenapp.ai.ModelConfig
-import com.cxh09.scanpenapp.ai.ModelConfigAdapter
 import com.cxh09.scanpenapp.ai.ModelConfigStore
+import com.cxh09.scanpenapp.ai.ModelDrawerBinder
 import com.cxh09.scanpenapp.ai.OpenAiClientHolder
 import com.cxh09.scanpenapp.ai.userMessage
 import com.cxh09.scanpenapp.databinding.ActivityAskAiBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
@@ -78,7 +84,7 @@ class AskAiActivity : AppCompatActivity() {
     private lateinit var historyAdapter: ChatHistoryAdapter
     private lateinit var configStore: ApiConfigStore
     private lateinit var modelStore: ModelConfigStore
-    private lateinit var modelDrawerAdapter: ModelConfigAdapter
+    private lateinit var modelDrawer: ModelDrawerBinder
     private lateinit var clientHolder: OpenAiClientHolder
     private lateinit var conversationStore: ConversationStore
     private var currentConversationId: Long? = null
@@ -133,12 +139,14 @@ class AskAiActivity : AppCompatActivity() {
      */
     private val sessionReasoning: MutableList<String?> = mutableListOf()
     private var sending: Boolean = false
+    private var sendingJob: Job? = null
     /**
-     * 思考模式本地镜像：初值在 onCreate 末尾从 [configStore] 同步，并随 [toggleThinkingMode]
-     * 持久化回 store。buildChatRequest 读的是 store 里的 [ApiConfig.thinkingMode]，
-     * 这里是 UI 状态源，保证重启 Activity 后按钮高亮与上次设置一致。
+     * 会话代数：每次 [sessionHistory] 被整体清空（[startNewChat] / [onHistoryClicked] / [deleteHistoryItem]）
+     * 时 +1。在 [onRegenerateClicked] / [onSendClicked] 启动协程时把当前代数捕获到局部 val，
+     * 流式响应收尾时若发现代数已变（说明用户中途切了会话），就丢弃响应、不写回 sessionHistory，
+     * 避免「把旧会话的答案写进新会话」与 IndexOutOfBoundsException。
      */
-    private var thinkingMode: Boolean = false
+    private var sessionEpoch: Int = 0
 
     /**
      * 当前会话的多模态附件（图片 / 文本文件）。生命周期与 [sessionHistory] 一致：
@@ -154,10 +162,25 @@ class AskAiActivity : AppCompatActivity() {
     /** 单张图片 base64 后最大允许字节数（1MB）。超过则按三级降级继续缩。 */
     private val attachmentImageMaxBase64Bytes: Long = 1024L * 1024L
 
+    /** 收藏摘要最大字符数。 */
+    private val snippetMaxLen: Int = 200
+
+    /** 收藏按钮「实心」闪一下的时长（ms），给用户即时的「已收藏」视觉确认。 */
+    private val bookmarkFlashMs: Long = 600L
+
+    /**
+     * 当前已显示的技能选择 BottomSheet，关闭时清空，避免泄露。
+     *
+     * 注：技能不再在 AskAiActivity 内以 system prompt 注入方式激活（已拆分为独立
+     * LivelyActivity / TranslateActivity / WritingActivity），所以这里不再持有任何
+     * activeSkillKey / activeSkillName / activeSkillSystemPrompt 状态。
+     */
+    private var skillsSheet: BottomSheetDialog? = null
+
     /** 拍照 launcher：回调 Boolean 表拍照成功；输出写入 [pendingPhotoUri] 指定的 FileProvider Uri。 */
     private lateinit var takePicture: ActivityResultLauncher<Uri>
-    /** 选文件 launcher：SAF 选任意文本文件。 */
-    private lateinit var pickFile: ActivityResultLauncher<String>
+    /** 自建文件选择器 launcher：回调 RESULT_OK 时从 data 中读 [AttachmentPickerActivity.EXTRA_FILE_URI]。 */
+    private lateinit var pickFile: ActivityResultLauncher<Intent>
     /** 拍照时正在使用的临时文件 Uri（onCreate 之外不要主动清空，让回调处理）。 */
     private var pendingPhotoUri: Uri? = null
     /** 拍照时正在使用的临时文件对象（与 [pendingPhotoUri] 配对，拍照完成后用其 delete() 清理）。 */
@@ -192,13 +215,10 @@ class AskAiActivity : AppCompatActivity() {
 
         setupHistoryList()
         setupInputBar()
-        setupSettingsRow()
         setupModelDrawer()
         applyModelToInputBar()
+        setupTopBar()
         registerAttachmentPickers()
-
-        // 同步持久化的思考模式到 UI（按钮高亮 + 局部状态）
-        applyThinkingMode(modelStore.current().thinkingMode)
 
         if (!modelStore.current().isComplete) {
             openSettings()
@@ -288,7 +308,12 @@ class AskAiActivity : AppCompatActivity() {
         if (currentConversationId == item.id) {
             currentConversationId = null
             currentSessionRecorded = false
+            // 切会话前：取消任何 in-flight 请求 + 把 sessionEpoch 推进，让旧协程的收尾逻辑
+            // 走「代数失效丢弃」分支，不再把响应写回已被清空的 sessionHistory。
+            cancelInFlightSending()
             sessionHistory.clear()
+            sessionReasoning.clear()
+            sessionEpoch++
             binding.llMessages.removeAllViews()
             // 重置流式渲染状态，防止旧任务把文字写回已清空的 TextView
             renderGeneration++
@@ -307,47 +332,405 @@ class AskAiActivity : AppCompatActivity() {
     }
 
     private fun setupInputBar() {
-        binding.btnNewChat.setOnClickListener { startNewChat() }
-        binding.btnQuick.setOnClickListener { toggleThinkingMode() }
-        binding.btnModel.setOnClickListener {
-            // 打开抽屉前刷新一次列表（用户可能刚改过配置）
-            loadModelsIntoDrawer()
-            binding.drawerRoot.openDrawer(GravityCompat.END)
-        }
+        binding.btnModel.setOnClickListener { modelDrawer.open() }
         binding.btnAdd.setOnClickListener { onAddClicked() }
         binding.etInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
-                onSendClicked()
+                if (sending) onStopClicked() else onSendClicked()
                 true
             } else {
                 false
             }
         }
-        binding.btnSend.setOnClickListener { onSendClicked() }
-    }
-
-    private fun toggleThinkingMode() {
-        applyThinkingMode(!thinkingMode)
-        // 持久化到 ModelConfigStore 的当前选中配置；
-        // onSendClicked 走 configStore.load().thinkingMode 拼装请求，二者互通
-        modelStore.updateCurrent { it.copy(thinkingMode = thinkingMode) }
+        binding.btnSend.setOnClickListener {
+            if (sending) onStopClicked() else onSendClicked()
+        }
     }
 
     /**
-     * 把 [enabled] 同时反映到按钮视觉（selected + 字体加粗）和局部 [thinkingMode] 字段。
-     * 抽出来供 onCreate 初始化与 toggleThinkingMode 共用，避免两处视觉同步代码漂移。
+     * 发送按钮 toggle 状态切换：
+     * - sending=true → 显示「×」停止图标 + R.string.ai_action_stop
+     * - sending=false → 显示「发送」图标 + R.string.ai_send_voice
      */
-    private fun applyThinkingMode(enabled: Boolean) {
-        thinkingMode = enabled
-        binding.btnQuick.isSelected = enabled
-        binding.btnQuick.setTypeface(
-            null,
-            if (enabled) Typeface.BOLD else Typeface.NORMAL,
+    private fun updateSendButtonState(sending: Boolean) {
+        // btnSend 内部是一个 ImageView，通过 getChildAt(0) 拿到
+        val iconView = (binding.btnSend.getChildAt(0) as? ImageView) ?: return
+        iconView.setImageResource(if (sending) R.drawable.ic_close else R.drawable.ic_send)
+        binding.btnSend.contentDescription = getString(
+            if (sending) R.string.ai_action_stop else R.string.ai_send_voice
         )
     }
 
-    private fun setupSettingsRow() {
-        binding.settingsRow.setOnClickListener { openSettings() }
+    /**
+     * 主动停止生成：仅取消协程，不修改任何状态。
+     * 协程取消后由 `onSendClicked` / `onRegenerateClicked` 的 `when` 分支统一收尾。
+     */
+    private fun onStopClicked() {
+        sendingJob?.cancel()
+    }
+
+    /**
+     * 取消当前进行中的发送 / 重新生成协程，并把 [sending] 置回 false。
+     * 用于切会话（[startNewChat] / [onHistoryClicked] / [deleteHistoryItem]）前的清理：
+     * - 取消协程 → 下一次流式 IO 阻塞点抛 CancellationException，提前终止网络请求
+     * - 即使协程内 `add` / `set` 仍跑一次，调用方在切完会话后会用 [sessionEpoch] 校验丢弃结果
+     * - 清掉 [sending] 否则下一次 onSendClicked 会被 `if (sending) return` 卡住
+     */
+    private fun cancelInFlightSending() {
+        sendingJob?.cancel()
+        sendingJob = null
+        if (sending) {
+            sending = false
+            updateSendButtonState(sending = false)
+        }
+    }
+
+    /**
+     * 复制 AI 回答：取已渲染的纯文本，复制到系统剪贴板，弹 Toast。
+     * 答案为空时静默不响应。
+     */
+    private fun onCopyClicked(views: AiMessageViews) {
+        val text = views.answer.text?.toString().orEmpty()
+        if (text.isBlank()) return
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("AI 回答", text))
+        Toast.makeText(this, R.string.ai_msg_copied, Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * 重新生成最后一条 AI 回答：
+     * - sending=true 时按钮已置灰不响应（见 appendAiMessage）
+     * - 找到 sessionHistory 中最后一条 assistant 消息下标 idx
+     * - 移除 binding.llMessages 中对应的 AI 气泡 view
+     * - 重置流式渲染游标
+     * - 重新发起请求，结束后原地覆盖 sessionHistory[idx] / sessionReasoning[idx]
+     * - 处理 CancellationException / Success / Failure 三种结果
+     */
+    private fun onRegenerateClicked(views: AiMessageViews) {
+        if (sending) return
+
+        // 1. 找 sessionHistory 中最近一条 assistant 消息的下标
+        val assistantIdx = sessionHistory.indexOfLast { it.role == ChatRole.Assistant }
+        if (assistantIdx < 0) return
+
+        // 1.5 捕获 sessionEpoch：流式响应收尾时校验，若用户在请求中途切了会话（startNewChat /
+        // onHistoryClicked / deleteHistoryItem 会 +1）就丢弃响应、不写回 sessionHistory，
+        // 避免「把旧会话的答案原地覆盖到新会话的错误下标」导致的 IndexOutOfBoundsException。
+        val myEpoch = sessionEpoch
+
+        // 2. 找 binding.llMessages 中最后一个 llAiBubble 父 LinearLayout（item_ai_msg_ai 的根）
+        //    策略：从末尾向前遍历，找到含 llAiBubble 的那一项
+        var bubbleViewIdx = -1
+        for (idx in binding.llMessages.childCount - 1 downTo 0) {
+            val child = binding.llMessages.getChildAt(idx)
+            if (child.findViewById<View?>(R.id.llAiBubble) != null) {
+                bubbleViewIdx = idx
+                break
+            }
+        }
+        if (bubbleViewIdx < 0) return
+        val oldBubbleView = binding.llMessages.getChildAt(bubbleViewIdx)
+        binding.llMessages.removeViewAt(bubbleViewIdx)
+
+        // 3. 重置流式渲染状态
+        renderGeneration++
+        lastRenderedNewlinePos = -1
+        lastRenderedLength = 0
+        lastRenderedThinkingLength = 0
+
+        // 4. 创建新 AI 气泡（PHASE_PENDING 起步）
+        val newViews = appendAiMessage("")
+
+        // 5. 准备 buffer
+        val responseBuffer = StringBuilder()
+        val thinkingBuffer = StringBuilder()
+        var firstChunk = true
+
+        // 6. UI 节流
+        val uiHandler = Handler(Looper.getMainLooper())
+        val uiUpdateRunnable = Runnable {
+            val snapshot = responseBuffer.toString()
+            val thinkingSnapshot = thinkingBuffer.toString()
+            binding.svMessages.post {
+                if (snapshot.isNotEmpty() && newViews.phase != AiMessageViews.PHASE_ANSWERING) {
+                    newViews.phase = AiMessageViews.PHASE_ANSWERING
+                }
+                renderThinkingText(thinkingSnapshot, newViews)
+                if (snapshot.isNotEmpty()) {
+                    renderStreamedMarkdown(snapshot, newViews.answer)
+                }
+                val bottom = binding.llMessages.bottom
+                if (bottom > binding.svMessages.height) {
+                    binding.svMessages.scrollTo(0, bottom - binding.svMessages.height)
+                }
+            }
+        }
+
+        // 7. 发起请求
+        val config: ApiConfig = configStore.load()
+        sending = true
+        updateSendButtonState(sending = true)
+
+        sendingJob = lifecycleScope.launch {
+            val outcome = runCatching {
+                withContext(Dispatchers.IO) {
+                    val openai = clientHolder.get()
+                    val request = clientHolder.buildChatRequest(config, effectiveMessages())
+                    openai.chatCompletions(request).collect { chunk ->
+                        chunk.choices.forEach { choice ->
+                            val delta = choice.delta
+                            val reasoningPiece = delta?.reasoningContent
+                            if (!reasoningPiece.isNullOrEmpty()) {
+                                thinkingBuffer.append(reasoningPiece)
+                            }
+                            val piece = delta?.content
+                            if (!piece.isNullOrEmpty()) {
+                                if (firstChunk) {
+                                    responseBuffer.setLength(0)
+                                    firstChunk = false
+                                }
+                                responseBuffer.append(piece)
+                            }
+                            if (!reasoningPiece.isNullOrEmpty() || !piece.isNullOrEmpty()) {
+                                uiHandler.removeCallbacks(uiUpdateRunnable)
+                                uiHandler.postDelayed(uiUpdateRunnable, 50L)
+                            }
+                        }
+                    }
+                }
+            }
+            uiHandler.removeCallbacks(uiUpdateRunnable)
+            val finalText = responseBuffer.toString()
+            val finalThinking = thinkingBuffer.toString()
+            if (finalThinking.isNotEmpty()) {
+                binding.svMessages.post { newViews.thinkingContent.text = finalThinking }
+            }
+            binding.svMessages.post { newViews.phase = AiMessageViews.PHASE_ANSWERING }
+            if (finalText.isNotEmpty()) {
+                binding.svMessages.post {
+                    markwon.setMarkdown(newViews.answer, finalText)
+                    val bottom = binding.llMessages.bottom
+                    if (bottom > binding.svMessages.height) {
+                        binding.svMessages.scrollTo(0, bottom - binding.svMessages.height)
+                    }
+                }
+            }
+
+            sending = false
+            updateSendButtonState(sending = false)
+
+            val exception = outcome.exceptionOrNull()
+            // sessionEpoch 校验：用户中途切了会话（旧协程被 cancelInFlightSending + 入口 +1）
+            // → 直接丢弃响应，跳过所有写回 sessionHistory / scrollMessagesToBottom 等 UI 操作，
+            // 避免在「错的对象」上操作引发的 crash 与状态污染。
+            val sessionStillValid = myEpoch == sessionEpoch
+            when {
+                exception is CancellationException -> {
+                    // 用户主动停止 → 原地覆盖 sessionHistory[assistantIdx]
+                    if (sessionStillValid
+                        && finalText.isNotEmpty()
+                        && assistantIdx in sessionHistory.indices
+                    ) {
+                        sessionHistory[assistantIdx] = ChatMessage(role = ChatRole.Assistant, content = finalText)
+                        sessionReasoning[assistantIdx] = finalThinking.takeIf { it.isNotEmpty() }
+                        saveCurrentConversation()
+                    }
+                    // 不弹错误
+                }
+                outcome.isSuccess -> {
+                    if (sessionStillValid
+                        && finalText.isNotEmpty()
+                        && assistantIdx in sessionHistory.indices
+                    ) {
+                        sessionHistory[assistantIdx] = ChatMessage(role = ChatRole.Assistant, content = finalText)
+                        sessionReasoning[assistantIdx] = finalThinking.takeIf { it.isNotEmpty() }
+                        saveCurrentConversation()
+                    } else if (finalText.isEmpty()) {
+                        newViews.answer.text = getString(R.string.ai_msg_empty)
+                    }
+                    if (sessionStillValid) scrollMessagesToBottom()
+                }
+                else -> {
+                    if (sessionStillValid) {
+                        val msg = exception?.message?.take(120) ?: exception?.javaClass?.simpleName ?: "未知错误"
+                        newViews.answer.text = getString(R.string.ai_error_send_fail, msg)
+                        scrollMessagesToBottom()
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 初始化主区顶部 4 按钮工具栏（返回 / 新对话 / 收藏 / 技能）。
+     * - 返回：直接 finish()，回到 MainActivity
+     * - 新对话：等价 sidebar 顶部 + 按钮，调用 startNewChat()
+     * - 收藏：空会话直接打开 BookmarkListActivity；已有会话则先写入 BookmarkStore 再打开
+     *   BookmarkListActivity（详见 [onTopbarBookmarkClicked]）
+     * - 技能：弹出技能选择 BottomSheet（[showSkillsSheet]）
+     */
+    private fun setupTopBar() {
+        binding.btnTopbarBack.setOnClickListener { finish() }
+        binding.btnTopbarNewChat.setOnClickListener { startNewChat() }
+        binding.btnTopbarBookmark.setOnClickListener { onTopbarBookmarkClicked() }
+        binding.btnTopbarShield.setOnClickListener { showSkillsSheet() }
+    }
+
+    /**
+     * 顶部收藏按钮点击处理：构造 conversation 类型 Bookmark 写入 BookmarkStore，然后打开
+     * BookmarkListActivity；空会话直接打开 BookmarkListActivity。
+     * - 视觉反馈：点击后立即把按钮图标切到「实心书签」[R.drawable.ic_bookmark_filled]，
+     *   ~600ms 后复原为「空心书签」[R.drawable.ic_bookmark_outline]，给用户明确的「收藏成功」确认
+     *   不持久化高亮态（每次进入页面都是「未收藏」外观，避免 IO 反查成本与误判）
+     * - 写盘 + 跳转都在 [lifecycleScope] 内串行：先 IO 写 BookmarkStore，再切回 Main 跳
+     *   BookmarkListActivity；不弹 Toast（Activity 即将跳走，Toast 无意义）
+     */
+    private fun onTopbarBookmarkClicked() {
+        // 视觉反馈：立刻切到实心书签，给用户即时确认（不等待 IO）
+        flashBookmarkFilled()
+
+        val convId = currentConversationId
+        if (convId == null) {
+            // 空会话：没有可收藏的对话，直接打开收藏列表
+            startActivity(
+                Intent(this, com.cxh09.scanpenapp.BookmarkListActivity::class.java)
+            )
+            return
+        }
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                // 取最后一条 assistant 消息的前 snippetMaxLen 字作为摘要
+                val snippet = sessionHistory.lastOrNull { it.role == ChatRole.Assistant }
+                    ?.content?.toString().orEmpty()
+                    .take(snippetMaxLen)
+                val title = currentConversationTitle()?.takeIf { it.isNotBlank() }
+                    ?: getString(R.string.ai_bookmark_default_title)
+                BookmarkStore(this@AskAiActivity).addBookmark(
+                    Bookmark(
+                        id = 0L,  // 由 BookmarkStore 重新分配
+                        type = Bookmark.TYPE_CONVERSATION,
+                        refId = convId.toString(),
+                        contentSnippet = snippet,
+                        title = title,
+                        createdAt = 0L,
+                    )
+                )
+            }
+            startActivity(
+                Intent(this@AskAiActivity, com.cxh09.scanpenapp.BookmarkListActivity::class.java)
+            )
+        }
+    }
+
+    /**
+     * 「实心书签」闪一下复原。
+     * - 切到 [R.drawable.ic_bookmark_filled] 立即生效（不依赖 IO 结果）
+     * - 600ms 后切回 [R.drawable.ic_bookmark_outline]
+     * - 用 `removeCallbacks` 防止快速连点导致多次 post 错位还原
+     */
+    private fun flashBookmarkFilled() {
+        binding.btnTopbarBookmark.removeCallbacks(bookmarkFlashRestore)
+        binding.btnTopbarBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+        binding.btnTopbarBookmark.postDelayed(bookmarkFlashRestore, bookmarkFlashMs)
+    }
+
+    private val bookmarkFlashRestore = Runnable {
+        binding.btnTopbarBookmark.setImageResource(R.drawable.ic_bookmark_outline)
+    }
+
+    // ============================================================
+    // 技能选择 BottomSheet
+    // ============================================================
+
+    /**
+     * 弹出技能选择 BottomSheet：
+     * - 内容由 [dialog_skills.xml] 提供，1×3 横向卡片
+     * - 点击任一卡片 → 关闭 BottomSheet 并启动对应独立 Activity（Lively / Translate / Writing）
+     * - BottomSheet 关闭时清空 [skillsSheet] 引用避免泄露
+     */
+    private fun showSkillsSheet() {
+        // 已显示则不重复弹（防止快速连点）
+        skillsSheet?.takeIf { it.isShowing }?.let { return }
+
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_skills, null, false)
+        bindSkillCard(
+            container = view.findViewById(R.id.skillLively),
+            key = SKILL_LIVELY,
+            nameRes = R.string.ai_skill_lively_name,
+            descRes = R.string.ai_skill_lively_desc,
+            iconRes = R.drawable.ic_skill_lively,
+        )
+        bindSkillCard(
+            container = view.findViewById(R.id.skillTranslate),
+            key = SKILL_TRANSLATE,
+            nameRes = R.string.ai_skill_translate_name,
+            descRes = R.string.ai_skill_translate_desc,
+            iconRes = R.drawable.ic_skill_translate,
+        )
+        bindSkillCard(
+            container = view.findViewById(R.id.skillWriting),
+            key = SKILL_WRITING,
+            nameRes = R.string.ai_skill_writing_name,
+            descRes = R.string.ai_skill_writing_desc,
+            iconRes = R.drawable.ic_skill_writing,
+        )
+
+        val dialog = BottomSheetDialog(this, R.style.Theme_ScanPenApp_BottomSheetDialog)
+        dialog.setContentView(view)
+        // 默认展开到 peek 高度之外：让用户能一眼看到全部 3 个卡片
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        dialog.setOnDismissListener { skillsSheet = null }
+        skillsSheet = dialog
+        dialog.show()
+    }
+
+    /**
+     * 把单个 item_skill.xml <include> 容器绑定业务字段：
+     * - 标题 / 描述 / 图标写好
+     * - 整张卡片可点击 → 走 onSkillClicked(key)
+     *
+     * 用 include 复用同一布局文件，避免重复定义 3 个几乎一样的卡片布局。
+     */
+    private fun bindSkillCard(
+        container: View,
+        key: String,
+        nameRes: Int,
+        descRes: Int,
+        iconRes: Int,
+    ) {
+        container.findViewById<TextView>(R.id.tvSkillName).setText(nameRes)
+        container.findViewById<TextView>(R.id.tvSkillDesc).setText(descRes)
+        container.findViewById<ImageView>(R.id.ivSkillIcon).setImageResource(iconRes)
+        container.setOnClickListener { onSkillClicked(key) }
+    }
+
+    /**
+     * 技能点击处理：关闭 BottomSheet，启动对应独立 Activity。
+     * - lively → LivelyActivity
+     * - translate → TranslateActivity
+     * - writing（原联网位）→ WritingActivity
+     */
+    private fun onSkillClicked(key: String) {
+        skillsSheet?.takeIf { it.isShowing }?.dismiss()
+        when (key) {
+            SKILL_LIVELY -> startActivity(Intent(this, LivelyActivity::class.java))
+            SKILL_TRANSLATE -> startActivity(Intent(this, TranslateActivity::class.java))
+            SKILL_WRITING -> startActivity(Intent(this, WritingActivity::class.java))
+        }
+    }
+
+    /**
+     * 实际拼到 OpenAI 请求的 messages 列表。
+     *
+     * 技能已拆分为独立 Activity，不再注入 skill system prompt；这里直接返回 sessionHistory。
+     */
+    private fun effectiveMessages(): List<ChatMessage> = sessionHistory.toList()
+
+    private companion object {
+        const val SKILL_LIVELY = "lively"
+        const val SKILL_TRANSLATE = "translate"
+        const val SKILL_WRITING = "writing"
     }
 
     private fun openSettings() {
@@ -355,32 +738,14 @@ class AskAiActivity : AppCompatActivity() {
     }
 
     /**
-     * 初始化右侧模型选择抽屉：
-     * - 列表 Adapter 用 [ModelConfigAdapter.VARIANT_DRAWER]（带打勾标记）
-     * - 点击列表项 → 切换 current_id → 关闭抽屉 → 重建 client → 刷新输入框按钮文案
-     * - 关闭按钮：仅关闭抽屉
-     * - 跳到设置：跳到 [AiSettingsActivity]
-     * - 抽屉默认 lockMode=locked，避免误滑
+     * 初始化右侧模型选择抽屉：与三个技能运行页共用 [ModelDrawerBinder]，保持 UI / 交互一致。
+     * 抽屉默认 lockMode=locked，避免误滑；列表 / 关闭 / 跳 AI 服务 全部由 binder 内部处理。
      */
     private fun setupModelDrawer() {
-        modelDrawerAdapter = ModelConfigAdapter(this, ModelConfigAdapter.VARIANT_DRAWER)
-        binding.lvModelsInDrawer.adapter = modelDrawerAdapter
-        binding.lvModelsInDrawer.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                modelDrawerAdapter.getItem(position)?.let(::onDrawerModelPicked)
-            }
-        binding.btnCloseDrawer.setOnClickListener {
-            binding.drawerRoot.closeDrawer(GravityCompat.END)
-        }
-        binding.drawerRoot.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        loadModelsIntoDrawer()
-    }
-
-    private fun onDrawerModelPicked(model: ModelConfig) {
-        modelStore.setCurrent(model.id)
-        binding.drawerRoot.closeDrawer(GravityCompat.END)
-        clientHolder.rebuild()
-        applyModelToInputBar()
+        modelDrawer = ModelDrawerBinder(this, modelStore) {
+            clientHolder.rebuild()
+            applyModelToInputBar()
+        }.also { it.bind() }
     }
 
     /** 把当前选中模型的 name 渲染到输入框 [btnModel] 按钮上。 */
@@ -391,33 +756,24 @@ class AskAiActivity : AppCompatActivity() {
         }
     }
 
-    /** 抽屉打开前重新加载（用户可能从 AI 服务页改了配置）。 */
-    private fun loadModelsIntoDrawer() {
-        val list = modelStore.loadAll()
-        modelDrawerAdapter.submit(list)
-        modelDrawerAdapter.setSelected(modelStore.currentId())
-        // 列表空时显示空态
-        val empty = list.isEmpty()
-        binding.tvDrawerEmpty.visibility = if (empty) View.VISIBLE else View.GONE
-        binding.lvModelsInDrawer.visibility = if (empty) View.GONE else View.VISIBLE
-    }
-
     override fun onResume() {
         super.onResume()
         // 从 AiSettingsActivity 返回后重读配置并刷新客户端
         clientHolder.rebuild()
-        loadModelsIntoDrawer()
         applyModelToInputBar()
-        // 思考模式可能也被改了，同步一下按钮高亮
-        applyThinkingMode(modelStore.current().thinkingMode)
+        // 抽屉列表同步刷新（用户可能改了配置 / 新增了模型）
+        modelDrawer.reload()
     }
 
     private fun startNewChat() {
         // Save current before switching
         saveCurrentConversation()
 
+        // 切会话前：取消任何 in-flight 请求 + 把 sessionEpoch 推进
+        cancelInFlightSending()
         sessionHistory.clear()
         sessionReasoning.clear()
+        sessionEpoch++
         binding.llMessages.removeAllViews()
         currentSessionRecorded = false
         currentConversationId = null
@@ -439,6 +795,10 @@ class AskAiActivity : AppCompatActivity() {
         // Save current conversation if it has unsaved changes
         saveCurrentConversation()
 
+        // 切历史前：取消 in-flight 请求 + 推进 sessionEpoch，避免旧会话的响应被写进新会话
+        cancelInFlightSending()
+        sessionEpoch++
+
         lifecycleScope.launch {
             val conversation = withContext(Dispatchers.IO) {
                 conversationStore.loadConversation(item.id)
@@ -446,6 +806,8 @@ class AskAiActivity : AppCompatActivity() {
 
             currentConversationId = item.id
             currentSessionRecorded = true
+            // sessionEpoch 已在 onHistoryClicked 入口处（cancelInFlightSending 同段）推进，
+            // 下面重建 sessionHistory 之后，旧协程即便流到收尾也只会走「代数失效」分支丢弃。
 
             // Rebuild sessionHistory for multi-turn context
             sessionHistory.clear()
@@ -473,8 +835,9 @@ class AskAiActivity : AppCompatActivity() {
                         val reasoning = msg.reasoning?.takeIf { it.isNotEmpty() }
                         if (reasoning != null) {
                             views.thinkingContent.text = reasoning
-                            views.phase = AiMessageViews.PHASE_ANSWERING
                         }
+                        // 历史 assistant 消息一律切到 ANSWERING，让底部操作栏显示
+                        views.phase = AiMessageViews.PHASE_ANSWERING
                     }
                 }
             }
@@ -498,6 +861,10 @@ class AskAiActivity : AppCompatActivity() {
         val text = binding.etInput.text?.toString().orEmpty().trim()
         if (text.isEmpty()) return
 
+        // 捕获 sessionEpoch：响应收尾时若发现用户中途切了会话，就丢弃响应、不写回
+        // sessionHistory / sessionReasoning，避免把上一会话的 AI 答案错加到新会话。
+        val myEpoch = sessionEpoch
+
         val config: ApiConfig = configStore.load()
         if (!config.isComplete) {
             Toast.makeText(this, R.string.ai_error_no_config, Toast.LENGTH_SHORT).show()
@@ -507,7 +874,7 @@ class AskAiActivity : AppCompatActivity() {
 
         hideKeyboard()
         sending = true
-        binding.btnSend.isEnabled = false
+        updateSendButtonState(sending = true)
 
         if (!currentSessionRecorded) {
             val now = timeFormatter.format(Date())
@@ -556,11 +923,11 @@ class AskAiActivity : AppCompatActivity() {
             }
         }
 
-        lifecycleScope.launch {
+        sendingJob = lifecycleScope.launch {
             val outcome = runCatching {
                 withContext(Dispatchers.IO) {
                     val openai = clientHolder.get()
-                    val request = clientHolder.buildChatRequest(config, sessionHistory.toList())
+                    val request = clientHolder.buildChatRequest(config, effectiveMessages())
                     openai.chatCompletions(request).collect { chunk ->
                         chunk.choices.forEach { choice ->
                             val delta = choice.delta
@@ -617,10 +984,30 @@ class AskAiActivity : AppCompatActivity() {
             }
 
             sending = false
-            binding.btnSend.isEnabled = true
-            outcome.fold(
-                onSuccess = {
-                    if (finalText.isNotEmpty()) {
+            updateSendButtonState(sending = false)
+
+            val exception = outcome.exceptionOrNull()
+            // sessionEpoch 校验：用户中途切了会话 → 丢弃响应
+            val sessionStillValid = myEpoch == sessionEpoch
+            when {
+                exception is CancellationException -> {
+                    // 用户主动停止 → 把已累积内容写入 sessionHistory
+                    if (sessionStillValid && finalText.isNotEmpty()) {
+                        sessionHistory.add(
+                            ChatMessage(role = ChatRole.Assistant, content = finalText)
+                        )
+                        sessionReasoning.add(finalThinking.takeIf { it.isNotEmpty() })
+                        saveCurrentConversation()
+                    }
+                    // 答案区显示「已停止」（如果之前是 PENDING 占位）
+                    if (sessionStillValid
+                        && aiViews.answer.text.toString() == getString(R.string.ai_msg_thinking)
+                    ) {
+                        aiViews.answer.text = getString(R.string.ai_msg_stopped)
+                    }
+                }
+                outcome.isSuccess -> {
+                    if (sessionStillValid && finalText.isNotEmpty()) {
                         sessionHistory.add(
                             ChatMessage(role = ChatRole.Assistant, content = finalText)
                         )
@@ -629,17 +1016,19 @@ class AskAiActivity : AppCompatActivity() {
                             finalThinking.takeIf { it.isNotEmpty() }
                         )
                         saveCurrentConversation()
-                    } else {
+                    } else if (finalText.isEmpty() && sessionStillValid) {
                         aiViews.answer.text = getString(R.string.ai_msg_empty)
                     }
-                    scrollMessagesToBottom()
-                },
-                onFailure = { e ->
-                    val msg = e.message?.take(120) ?: e::class.java.simpleName
-                    aiViews.answer.text = getString(R.string.ai_error_send_fail, msg)
-                    scrollMessagesToBottom()
-                },
-            )
+                    if (sessionStillValid) scrollMessagesToBottom()
+                }
+                else -> {
+                    if (sessionStillValid) {
+                        val msg = exception?.message?.take(120) ?: exception?.javaClass?.simpleName ?: "未知错误"
+                        aiViews.answer.text = getString(R.string.ai_error_send_fail, msg)
+                        scrollMessagesToBottom()
+                    }
+                }
+            }
         }
     }
 
@@ -673,6 +1062,9 @@ class AskAiActivity : AppCompatActivity() {
         val thinkingContent: TextView,
         val divider: View,
         val answer: TextView,
+        val actionsContainer: View,
+        val btnRegenerate: View,
+        val btnCopy: View,
     ) {
         /** 用户手动展开思考内容；仅在 ANSWERING 阶段生效（THINKING 阶段始终展开）。 */
         private var userExpanded: Boolean = false
@@ -702,6 +1094,7 @@ class AskAiActivity : AppCompatActivity() {
                     thinkingContent.visibility = View.GONE
                     divider.visibility = View.GONE
                     answer.visibility = View.VISIBLE
+                    actionsContainer.visibility = View.GONE
                 }
                 PHASE_THINKING -> {
                     thinkingSection.visibility = View.VISIBLE
@@ -709,6 +1102,7 @@ class AskAiActivity : AppCompatActivity() {
                     divider.visibility = View.GONE
                     answer.visibility = View.GONE  // 思考阶段：推理内容本身证明"在思考"
                     thinkingHeader.setText(R.string.ai_thinking_header_expanded)
+                    actionsContainer.visibility = View.GONE
                 }
                 PHASE_ANSWERING -> {
                     thinkingSection.visibility = View.VISIBLE
@@ -719,6 +1113,7 @@ class AskAiActivity : AppCompatActivity() {
                         if (userExpanded) R.string.ai_thinking_header_expanded
                         else R.string.ai_thinking_header_collapsed
                     )
+                    actionsContainer.visibility = View.VISIBLE
                 }
             }
         }
@@ -741,10 +1136,16 @@ class AskAiActivity : AppCompatActivity() {
             thinkingContent = view.findViewById(R.id.tvThinkingContent),
             divider = view.findViewById(R.id.vDivider),
             answer = view.findViewById(R.id.tvMsgContent),
+            actionsContainer = view.findViewById(R.id.llAiActions),
+            btnRegenerate = view.findViewById(R.id.btnAiRegenerate),
+            btnCopy = view.findViewById(R.id.btnAiCopy),
         )
         views.answer.text = answerText
         // 双击答案区 → 全屏查看当前文本
         attachDoubleTapToFullscreen(views.answer)
+        // 消息底部操作栏
+        views.btnRegenerate.setOnClickListener { if (!sending) onRegenerateClicked(views) }
+        views.btnCopy.setOnClickListener { onCopyClicked(views) }
         binding.llMessages.addView(view)
         scrollMessagesToBottom()
         return views
@@ -766,6 +1167,7 @@ class AskAiActivity : AppCompatActivity() {
                     this@AskAiActivity,
                     text,
                     currentConversationTitle(),
+                    currentConversationId,
                 )
                 return true
             }
@@ -956,19 +1358,21 @@ class AskAiActivity : AppCompatActivity() {
                 }
             }
         }
-        pickFile = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri == null) return@registerForActivityResult
+        pickFile = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode != RESULT_OK) return@registerForActivityResult
+            val uriString = result.data?.getStringExtra(AttachmentPickerActivity.EXTRA_FILE_URI) ?: return@registerForActivityResult
+            val uri = Uri.parse(uriString)
             lifecycleScope.launch {
-                val result = withContext(Dispatchers.IO) { loadTextAttachment(uri) }
-                if (result == null) {
+                val attachmentResult = withContext(Dispatchers.IO) { loadTextAttachment(uri) }
+                if (attachmentResult == null) {
                     Toast.makeText(
                         this@AskAiActivity,
                         R.string.ai_attach_not_text,
                         Toast.LENGTH_SHORT,
                     ).show()
                 } else {
-                    val wasTruncated = result.sizeBytes > attachmentMaxBytes
-                    attachments.add(result)
+                    val wasTruncated = attachmentResult.sizeBytes > attachmentMaxBytes
+                    attachments.add(attachmentResult)
                     renderAttachmentPreview()
                     if (wasTruncated) {
                         Toast.makeText(
@@ -983,23 +1387,57 @@ class AskAiActivity : AppCompatActivity() {
     }
 
     /**
-     * + 按钮：弹出选择面板（拍照 / 文件），二选一走对应 launcher。
-     * 用 AlertDialog 列表实现，避免引入 BottomSheetDialog（包体更小）。
+     * + 按钮：弹出 1×2 横排卡片 BottomSheet（文件 / 拍照）。
+     * - 「文件」：关闭 BottomSheet → 启动 [AttachmentPickerActivity]
+     * - 「拍照」：关闭 BottomSheet → 弹 Toast「暂未开放」（硬件未就绪时的早期占位）
+     *
+     * 用 BottomSheetDialog 而非 AlertDialog 是为了贴合 1:4 横屏：
+     * 横向一排两张大卡片在窄长屏幕上比 AlertDialog 单列列表更易点。
      */
     private fun onAddClicked() {
-        val options = arrayOf(
-            getString(R.string.ai_attach_pick_camera),
-            getString(R.string.ai_attach_pick_file),
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_attach_picker, null, false)
+        bindAttachEntry(
+            container = view.findViewById(R.id.entryFile),
+            iconRes = R.drawable.ic_folder,
+            nameRes = R.string.attach_entry_file,
         )
-        AlertDialog.Builder(this, R.style.Theme_ScanPenApp_AlertDialog_Dark)
-            .setTitle(R.string.ai_attach_pick_title)
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> launchTakePicture()
-                    1 -> pickFile.launch("*/*")
-                }
-            }
-            .show()
+        bindAttachEntry(
+            container = view.findViewById(R.id.entryCamera),
+            iconRes = R.drawable.ic_camera_switch,
+            nameRes = R.string.attach_entry_camera,
+        )
+        view.findViewById<View>(R.id.entryFile).setOnClickListener {
+            attachSheet?.takeIf { it.isShowing }?.dismiss()
+            pickFile.launch(Intent(this, AttachmentPickerActivity::class.java))
+        }
+        view.findViewById<View>(R.id.entryCamera).setOnClickListener {
+            attachSheet?.takeIf { it.isShowing }?.dismiss()
+            Toast.makeText(this, R.string.attach_entry_camera_placeholder, Toast.LENGTH_SHORT).show()
+        }
+
+        val dialog = BottomSheetDialog(this, R.style.Theme_ScanPenApp_BottomSheetDialog)
+        dialog.setContentView(view)
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        dialog.setOnDismissListener { attachSheet = null }
+        attachSheet = dialog
+        dialog.show()
+    }
+
+    /** 当前已显示的「+」附件选择 BottomSheet，关闭时清空，避免泄露。 */
+    private var attachSheet: BottomSheetDialog? = null
+
+    /**
+     * 把单个 item_attach_entry.xml 容器绑定业务字段：
+     * - 图标 / 名称写好
+     * - 整体卡片可点击由调用方通过 container.setOnClickListener 设置
+     */
+    private fun bindAttachEntry(
+        container: View,
+        iconRes: Int,
+        nameRes: Int,
+    ) {
+        container.findViewById<ImageView>(R.id.ivEntryIcon).setImageResource(iconRes)
+        container.findViewById<TextView>(R.id.tvEntryName).setText(nameRes)
     }
 
     /**

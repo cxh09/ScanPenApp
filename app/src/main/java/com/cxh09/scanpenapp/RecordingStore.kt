@@ -27,7 +27,7 @@ data class Recording(
  * - 系统注册：MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
  * - 不申请 WRITE_EXTERNAL_STORAGE（API ≤ 28 走 manifest maxSdkVersion=28，录音文件用 filesDir 无需权限）
  *
- * 注意：minSdk=24，需要分支处理 RELATIVE_PATH。
+ * 注意：minSdk=21，需要分支处理 RELATIVE_PATH。
  */
 object RecordingStore {
 

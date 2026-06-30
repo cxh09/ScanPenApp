@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  顶部工具栏图标按钮背景：圆角 12dp 灰底。
+  - default：`surface/level_1`（#1A1A1A）
+  - pressed：`surface/level_2`（#2A2A2A），按下态比 default 亮一档（符合项目「按下态更亮」规则）
+  - disabled：`surface/level-1` + alpha 0.4（disabled 是「逻辑不可点击」态，与「按下态更亮」不冲突；本按钮的 disabled 仅
+    用于空会话时的「收藏」按钮，使用 alpha 弱化而非 alpha 叠加在按下色上，避免两层 alpha 叠加
+  - 严禁 alpha 叠加做 hover；按下色直接写死
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_level_1" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_level_2" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_level_1" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

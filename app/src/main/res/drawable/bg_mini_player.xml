@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    mini player 容器背景：`bg_base` 黑底 + 1dp 顶 `divider_strong` 分隔线
+    - 用于 activity_music.xml 的 mini player 56dp 行
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 1dp 顶部分隔线 -->
+    <item
+        android:height="1dp"
+        android:gravity="top">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/divider_strong" />
+        </shape>
+    </item>
+    <!-- 主背景 -->
+    <item android:top="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/player_mini_bg" />
+        </shape>
+    </item>
+</layer-list>

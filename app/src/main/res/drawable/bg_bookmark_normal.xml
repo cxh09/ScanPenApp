@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  收藏列表项未选中态背景：与历史对话列表项同款风格。
+  - 静态填充使用 ai_sidebar_hover（深色模式中性灰），与侧边栏背景区分开。
+  - 圆角 12dp，符合 list item 的视觉权重。
+  - 通过 <inset> 让圆角比 item 本身小一圈：与侧边栏边缘、上下相邻 item 都有呼吸空间。
+  - 内含 ripple：触摸时给用户按下的视觉反馈。
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="6dp"
+    android:insetRight="6dp"
+    android:insetTop="4dp"
+    android:insetBottom="4dp">
+    <ripple android:color="?attr/colorControlHighlight">
+        <item android:id="@android:id/mask">
+            <shape android:shape="rectangle">
+                <solid android:color="#FFFFFF" />
+                <corners android:radius="12dp" />
+            </shape>
+        </item>
+        <item>
+            <shape android:shape="rectangle">
+                <solid android:color="@color/ai_sidebar_hover" />
+                <corners android:radius="12dp" />
+            </shape>
+        </item>
+    </ripple>
+</inset>

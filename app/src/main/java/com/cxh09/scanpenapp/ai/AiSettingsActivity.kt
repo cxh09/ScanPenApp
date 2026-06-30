@@ -200,7 +200,6 @@ class AiSettingsActivity : AppCompatActivity() {
                 apiKey = key,
                 baseUrl = host,
                 model = model,
-                thinkingMode = false,
             )
             store.add(newModel)
             isDraft = false
@@ -309,7 +308,6 @@ class AiSettingsActivity : AppCompatActivity() {
             apiKey = key,
             baseUrl = host,
             model = model,
-            thinkingMode = false,
         )
         val tempHolder = OpenAiClientHolder { tempConfig }
         val openai: OpenAI = tempHolder.get()

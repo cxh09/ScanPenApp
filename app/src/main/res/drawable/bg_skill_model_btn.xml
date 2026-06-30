@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  技能页「模型选择」按钮灰底：
+  - default：`surface/level-1`（#1A1A1A）灰底
+  - pressed：`surface/level-2`（#2A2A2A）按下态更亮一档
+  - 圆角 12dp 跟随全项目统一规范
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_level_2" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/surface_level_1" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

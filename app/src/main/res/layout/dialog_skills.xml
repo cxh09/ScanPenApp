@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    技能选择 BottomSheet 内容：
+    - 顶部 4dp 把手柄（视觉提示：可下滑关闭）
+    - 标题
+    - 横向一排 3 个技能卡片（item_skill.xml）：灵动表达 / 翻译 / 写作
+    - 圆角仅顶部 12dp（BottomSheetDialog 自身已处理底部贴近屏幕）
+    - 背景 surface/level-2 区别于 chat bg #000000
+    - 点击技能卡片 → 启动对应独立 Activity（已不再做 toggle 激活态）
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="20dp">
+
+    <!-- 把手柄：居中 4×32dp 圆条 -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/ai_sidebar_divider" />
+
+    <!-- 标题行 -->
+    <TextView
+        android:id="@+id/tvSkillsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/ai_skills_title"
+        android:textColor="@color/ai_text_primary"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <!-- 技能卡片行：1×3 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <!-- 技能 1：灵动表达 -->
+        <include
+            android:id="@+id/skillLively"
+            layout="@layout/item_skill" />
+
+        <View
+            android:layout_width="10dp"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/skillTranslate"
+            layout="@layout/item_skill" />
+
+        <View
+            android:layout_width="10dp"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/skillWriting"
+            layout="@layout/item_skill" />
+
+    </LinearLayout>
+
+</LinearLayout>

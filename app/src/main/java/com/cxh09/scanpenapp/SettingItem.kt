@@ -17,7 +17,7 @@ enum class SettingType {
 }
 
 data class SettingItem(
-    @DrawableRes val iconRes: Int,
+    @field:DrawableRes val iconRes: Int,
     val title: String,
     val type: SettingType
 )

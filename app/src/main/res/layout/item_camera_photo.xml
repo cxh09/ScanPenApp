@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    相册网格单条目（2 列 GridLayoutManager）：
+    - 根 FrameLayout 让卡片铺满 grid cell；padding 4dp 给网格留白
+    - 内部 LinearLayout 卡片：圆角 8dp（复用 bg_skill_card）
+    - 缩略图 weight=1 + 底部信息栏（时间 + 文件名）
+    - 高度由 GridLayoutManager 自动算，不要固定 height
+    - 点击 / 长按 / 按下态涟漪都走根 FrameLayout（foreground=?attr/selectableItemBackground）
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:padding="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_skill_card"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/ivThumb"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:background="@color/surface_level_2"
+            android:contentDescription="@null"
+            android:minHeight="120dp"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/surface_level_1"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/ai_text_secondary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/ai_text_tertiary"
+                android:textSize="11sp" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

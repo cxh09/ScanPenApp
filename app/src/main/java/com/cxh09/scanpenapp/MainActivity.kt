@@ -37,6 +37,14 @@ class MainActivity : AppCompatActivity() {
         binding.btnRecorder.setOnClickListener {
             startActivity(Intent(this, RecorderActivity::class.java))
         }
+
+        binding.btnYinyue.setOnClickListener {
+            startActivity(Intent(this, MusicActivity::class.java))
+        }
+
+        binding.btnNote.setOnClickListener {
+            startActivity(Intent(this, NoteListActivity::class.java))
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

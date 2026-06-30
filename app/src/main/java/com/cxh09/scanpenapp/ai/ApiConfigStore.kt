@@ -8,7 +8,7 @@ import android.content.Context
  * "单条 ApiConfig" 形态读写，**始终代表当前选中那条**模型配置。
  *
  * ### 写入
- * - [save] 会把传入的 4 字段合并到当前选中的 [ModelConfig]（保留 id / name）后回写。
+ * - [save] 会把传入的 3 字段合并到当前选中的 [ModelConfig]（保留 id / name）后回写。
  * - [clear] 不建议使用；保留以兼容旧 API，内部等价于「重置为占位」。
  *
  * ### 读取
@@ -28,7 +28,6 @@ class ApiConfigStore(context: Context) {
             apiKey = config.apiKey,
             baseUrl = config.baseUrl,
             model = config.model,
-            thinkingMode = config.thinkingMode,
         ) }
     }
 
@@ -38,6 +37,8 @@ class ApiConfigStore(context: Context) {
             .remove("models_json")
             .remove("current_model_id")
             .apply()
+        // 同步让 ModelConfigStore 失效内存缓存，避免后续读到的还是旧数据
+        modelStore.invalidateCache()
         modelStore.loadAll()
     }
 

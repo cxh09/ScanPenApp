@@ -22,19 +22,18 @@
         android:paddingStart="8dp"
         android:paddingEnd="12dp">
 
-        <TextView
+        <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_topbar_btn"
             android:clickable="true"
+            android:contentDescription="@string/qr_scan_back"
             android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="12dp"
-            android:text="@string/qr_scan_back"
-            android:textColor="#E8E8ED"
-            android:textSize="14sp" />
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_left"
+            app:tint="@color/ai_text_primary" />
 
         <TextView
             android:layout_width="0dp"
@@ -128,19 +127,19 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btnBack2"
-            android:layout_width="wrap_content"
-            android:layout_height="44dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginTop="12dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="@drawable/bg_topbar_btn"
             android:clickable="true"
+            android:contentDescription="@string/qr_scan_back"
             android:focusable="true"
-            android:gravity="center"
-            android:minWidth="120dp"
-            android:text="@string/qr_scan_back"
-            android:textColor="#8E8E93"
-            android:textSize="14sp" />
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_left"
+            app:tint="@color/ai_text_primary" />
     </LinearLayout>
 
 </FrameLayout>

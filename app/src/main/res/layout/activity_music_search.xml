@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    云音乐 → 搜索结果页（1:4 窄屏横屏适配）：
+    - 顶部栏 48dp：返回 + 搜索输入 + 搜索按钮
+    - 主体：2 列网格 RecyclerView（GridLayoutManager spanCount=2）
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_base"
+    android:orientation="vertical">
+
+    <!-- 顶部栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/ai_chat_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="6dp">
+
+        <ImageView
+            android:id="@+id/btnMusicSearchBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_topbar_btn"
+            android:clickable="true"
+            android:contentDescription="@string/ai_settings_back"
+            android:focusable="true"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_left"
+            app:tint="@color/ai_text_primary" />
+
+        <EditText
+            android:id="@+id/etMusicSearchKeyword"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_input"
+            android:hint="@string/music_search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_tertiary"
+            android:textSize="14sp"
+            tools:ignore="Autofill,LabelFor" />
+
+        <ImageView
+            android:id="@+id/btnMusicSearchGo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_topbar_btn"
+            android:clickable="true"
+            android:contentDescription="@string/music_search_hint"
+            android:focusable="true"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_search"
+            app:tint="@color/text_primary" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_strong" />
+
+    <!-- 主体：2 列网格 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvMusicSearchResults"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="ifContentScrolls"
+            android:padding="6dp"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_music_search" />
+
+        <ProgressBar
+            android:id="@+id/pbMusicSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/text_tertiary"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvMusicSearchEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="@string/music_search_hint"
+            android:textColor="@color/text_tertiary"
+            android:textSize="13sp" />
+    </FrameLayout>
+</LinearLayout>

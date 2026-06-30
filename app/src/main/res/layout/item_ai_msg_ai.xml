@@ -9,6 +9,7 @@
     - tvMsgContent：最终答案区；初始文字"正在思考…"作为 PENDING 阶段的占位
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -113,5 +114,51 @@
             android:textIsSelectable="true"
             android:textSize="14sp"
             tools:text="AI 消息示例" />
+
+        <!--
+            消息底部操作栏：仅 ANSWERING 阶段显示（applyPhase() 控制）。
+            - 24dp 高，与气泡右下角对齐（容器 gravity=end）
+            - 3 个 24dp 图标按钮（重新生成 / 复制 / 分享），命中区域 32dp
+            - tint 用 @color/ai_msg_role 弱化（与气泡上方"AI"角色标签同色），避免抢眼
+            - 间距 16dp，paddingTop=4dp 与气泡底部留 4dp 视觉间距
+        -->
+        <LinearLayout
+            android:id="@+id/llAiActions"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_marginTop="4dp"
+            android:gravity="end|center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/btnAiRegenerate"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/ai_msg_regenerate"
+                android:focusable="true"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_refresh"
+                app:tint="@color/ai_msg_role" />
+
+            <ImageView
+                android:id="@+id/btnAiCopy"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/ai_msg_copy"
+                android:focusable="true"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_content_copy"
+                app:tint="@color/ai_msg_role" />
+
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

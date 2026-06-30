@@ -16,7 +16,6 @@
     <string name="ai_greeting">有什么我能帮你的吗？</string>
     <string name="ai_input_hint">发消息…</string>
     <string name="ai_quick_action">快速</string>
-    <string name="ai_thinking">思考</string>
     <string name="ai_send_voice">语音输入</string>
 
     <!-- 问 AI：API 设置 -->
@@ -108,6 +107,60 @@
     <string name="ai_fullscreen_title">AI 回答</string>
     <string name="ai_fullscreen_back">← 返回</string>
 
+    <!-- 问 AI：消息操作（停止生成 / 重新生成 / 复制 / 分享） -->
+    <string name="ai_msg_regenerate">重新生成</string>
+    <string name="ai_msg_copy">复制</string>
+    <string name="ai_msg_share">分享</string>
+    <string name="ai_msg_copied">已复制到剪贴板</string>
+    <string name="ai_msg_share_failed">未找到可分享的应用</string>
+    <string name="ai_action_stop">停止生成</string>
+    <string name="ai_msg_stopped">已停止</string>
+
+    <!-- 问 AI：主区顶部工具栏 3 按钮（返回 / 新对话 / 收藏） -->
+    <string name="ai_topbar_back">返回</string>
+    <string name="ai_topbar_new_chat">新对话</string>
+    <string name="ai_topbar_bookmark">收藏</string>
+    <string name="ai_topbar_shield">安全发送</string>
+    <string name="ai_bookmark_added">已加入收藏</string>
+
+    <!-- 问 AI：技能选择 BottomSheet -->
+    <string name="ai_skills_title">技能</string>
+    <string name="ai_skill_lively_name">灵动表达</string>
+    <string name="ai_skill_lively_desc">让文字更生动、更有画面感</string>
+    <string name="ai_skill_translate_name">翻译</string>
+    <string name="ai_skill_translate_desc">中英日多语种互译</string>
+    <string name="ai_skill_writing_name">写作</string>
+    <string name="ai_skill_writing_desc">激发灵感 / 改写 / 续写 / 标题润色</string>
+    <!-- 技能 system 提示：原样发到模型。约束输出风格 / 行为，不写用户级内容。 -->
+    <string name="ai_skill_lively_prompt">你是一位「灵动表达」润色助手。用户会给你一句话或一段文字，请**只针对表达方式**（用词、句式、修辞、画面感）进行优化。严格遵守：1) 只优化用户输入的那句话 / 那一段，**不补充新内容、不添加新例子、新观点或新事实**；2) **不要扩写**，长度与原文相当；3) **保持原意与事实**，不要为了生动而编造细节；4) 可以用更具体的细节、比喻、节奏变化来替换原有表达，但替换后的内容必须仍能在原文中找到对应。直接给出润色后的文本，不要附加解释、前后说明或元描述。</string>
+    <string name="ai_skill_translate_prompt">你是一位专业翻译。当用户输入任何语言的内容时，请把内容翻译成自然流畅的简体中文；如果输入本身就是中文，则翻译成英文。直接给出翻译结果，不要附加解释、注释或原文。如果输入是单词或短语，给出在常见语境下最合适的译法。</string>
+    <string name="ai_skill_writing_prompt">你是一位中文写作助手。用户会给你主题、要点、草稿或一句话指令，请你直接产出可用的中文文本，覆盖但不限于：灵感清单、标题润色、短文案、邮件草稿、扩写、续写、改写、要点总结。写作风格按用户意图走，没特别说明就用「清晰、得体、不油腻」的中性书面语。不要联网、不要做事实核查、不要在开头复述本指令、不要给「以下是…」这类元说明，直接给出最终文本。</string>
+
+    <!-- 技能运行页（灵动表达 / 翻译 / 写作 共用） -->
+    <string name="skill_run_action">运行</string>
+    <string name="skill_run_stop">停止</string>
+    <string name="skill_run_empty_hint">请输入内容</string>
+    <string name="skill_run_input_hint_default">输入内容…</string>
+    <string name="skill_run_input_hint_lively">输入要润色的文字…</string>
+    <string name="skill_run_input_hint_translate">输入要翻译的内容…</string>
+    <string name="skill_run_input_hint_writing">输入主题、要点或草稿，我来帮你写…</string>
+    <string name="skill_run_error_no_config">请先在 AI 服务设置中填写 API 信息</string>
+    <!-- 模型选择（输入框内 btnModel） -->
+    <string name="skill_run_model_select_title">选择模型</string>
+    <string name="skill_run_model_empty">还没有模型配置，请先去 AI 服务设置里添加</string>
+    <!-- 技能页左侧边栏（icon+文字 按钮） -->
+    <string name="skill_sidebar_api">API</string>
+    <string name="skill_sidebar_about">关于</string>
+    <!-- 「关于」对话框（保留旧字符串以备可能复用） -->
+    <string name="skill_about_title">关于 ScanPenApp</string>
+    <string name="skill_about_version_fmt">版本 %1$s</string>
+    <string name="skill_about_description">AI 词典笔应用</string>
+    <string name="skill_about_ok">知道了</string>
+    <!-- 技能「关于」新 Activity -->
+    <string name="skill_about_topbar_title">关于</string>
+    <string name="skill_about_author_label">提供方</string>
+    <string name="skill_about_author">cxh09</string>
+
     <!-- 问 AI：历史对话长按删除 -->
     <string name="ai_history_delete_title">删除对话</string>
     <string name="ai_history_delete_message">确定要删除这条对话吗？</string>
@@ -125,9 +178,31 @@
     <string name="ai_attach_not_text">仅支持文本文件</string>
     <string name="ai_attach_truncated">已截断到 50KB</string>
 
+    <!-- 问 AI：自定义附件选择器（1×4 入口 + 文件浏览页） -->
+    <string name="attach_pick_title">选择附件</string>
+    <string name="attach_pick_all">全部</string>
+    <string name="attach_pick_picture">图片</string>
+    <string name="attach_pick_doc">文档</string>
+    <string name="attach_pick_download">下载</string>
+    <string name="attach_picker_title">选择文件</string>
+    <string name="attach_picker_subtitle">%1$s</string>
+    <string name="attach_picker_empty">此目录为空</string>
+    <string name="attach_picker_no_access">无法访问此目录</string>
+    <string name="attach_picker_need_permission">需要存储权限</string>
+    <string name="attach_picker_dir_label">目录</string>
+    <string name="attach_picker_root_label">内部存储</string>
+    <string name="attach_entry_file">文件</string>
+    <string name="attach_entry_camera">拍照</string>
+    <string name="attach_entry_camera_placeholder">暂未开放</string>
+    <string name="attach_picker_path_template">内部存储 / %1$s</string>
+    <string name="attach_picker_root">内部存储</string>
+    <string name="attach_picker_unknown_type">未知文件</string>
+
     <!-- 微聊页面 -->
+    <string name="chat_back">返回</string>
     <string name="chat_search_hint">搜索</string>
     <string name="chat_empty_hint">点击右上角 + 开始新对话</string>
+    <string name="chat_under_development">页面还在开发中</string>
 
     <!-- 微聊：右侧会话标题与操作 -->
     <string name="chat_action_emoji">表情</string>
@@ -169,7 +244,57 @@
     <!-- 主页新增：相机 / 录音机 -->
     <string name="btn_camera">相机</string>
     <string name="btn_recorder">录音机</string>
+    <string name="btn_yinyue">云音乐</string>
+    <string name="title_yinyue">云音乐</string>
     <string name="main_more_coming">更多 即将推出</string>
+
+    <!-- 云音乐页 -->
+    <string name="music_account_login">账号登录</string>
+    <string name="music_playlist">我的歌单</string>
+    <string name="music_playlist_count_fmt">我的歌单 (%1$d)</string>
+    <string name="music_playlist_empty">还没有歌单\n请先登录账号</string>
+    <string name="music_daily_empty">每日推荐正在路上…</string>
+    <string name="music_playlist_subtitle">%1$d 首</string>
+    <!-- 云音乐 → 服务器设置页 -->
+    <string name="music_settings_title">服务器设置</string>
+    <string name="music_settings_server_address">服务器地址</string>
+    <string name="music_settings_server_address_hint">例如：api.example.com</string>
+    <string name="music_settings_server_port">端口</string>
+    <string name="music_settings_server_port_hint">例如：443</string>
+    <string name="music_settings_address_required">请填写服务器地址</string>
+    <string name="music_settings_port_required">请填写端口</string>
+    <string name="music_settings_port_invalid">端口必须在 1 ~ 65535 之间</string>
+    <string name="music_settings_no_server">请先在服务器设置中填写地址</string>
+
+    <!-- 云音乐 → 搜索 -->
+    <string name="music_search_title">搜索</string>
+    <string name="music_search_hint">搜索歌曲、歌手…</string>
+    <string name="music_search_empty">请输入搜索关键词</string>
+    <string name="music_search_no_results">没有找到相关歌曲</string>
+    <string name="music_search_fail">搜索失败，请检查服务器设置</string>
+
+    <!-- 云音乐 → 二维码登录 -->
+    <string name="music_login_title">扫码登录</string>
+    <string name="music_login_status_loading">正在准备二维码…</string>
+    <string name="music_login_status_wait_scan">请使用网易云音乐 APP 扫码</string>
+    <string name="music_login_status_scanned">已扫码，请在手机上确认登录</string>
+    <string name="music_login_status_expired">二维码已过期，请刷新</string>
+    <string name="music_login_hint">二维码有效期约 2 分钟</string>
+    <string name="music_login_refresh">刷新二维码</string>
+    <string name="music_login_no_server">请先在服务器设置中配置地址</string>
+    <string name="music_login_qr_decode_fail">二维码图片解析失败</string>
+    <string name="music_login_network_fail">网络请求失败，请检查服务器</string>
+    <string name="music_login_no_cookie">登录成功但未返回登录信息</string>
+    <string name="music_login_success">登录成功</string>
+
+    <!-- 云音乐 → 顶栏登录 / 登出 -->
+    <string name="music_logged_in">已登录</string>
+    <string name="music_logged_in_fmt">已登录 · %1$s</string>
+    <string name="music_logout_title">退出登录</string>
+    <string name="music_logout_message">确定要退出当前账号吗？</string>
+    <string name="music_logout_confirm">退出登录</string>
+    <string name="music_logout_cancel">取消</string>
+    <string name="music_logout_success">已退出登录</string>
 
     <!-- 相机页面 -->
     <string name="camera_title">相机</string>
@@ -183,8 +308,22 @@
     <string name="camera_save_fail">保存失败</string>
     <string name="camera_record_too_short">录音时间过短</string>
 
+    <!-- 相机页：应用内相册 (ScanAppCamera) -->
+    <string name="camera_album_title">ScanAppCamera 相册</string>
+    <string name="camera_album_empty">还没有照片</string>
+    <string name="camera_album_empty_hint">回到相机页面拍第一张</string>
+    <string name="camera_album_delete_title">删除照片</string>
+    <string name="camera_album_delete_message">确定要删除这张照片吗？</string>
+    <string name="camera_album_delete_confirm">删除</string>
+    <string name="camera_album_delete_cancel">取消</string>
+
+    <!-- 相机页：全屏照片查看 -->
+    <string name="camera_viewer_title">照片查看</string>
+    <string name="camera_saved_to_album">已保存到 ScanAppCamera 相册</string>
+
     <!-- 录音机页面 -->
     <string name="recorder_title">录音机</string>
+    <string name="recorder_back">返回</string>
     <string name="recorder_new">新录音</string>
     <string name="recorder_start">开始</string>
     <string name="recorder_stop">停止</string>
@@ -204,4 +343,63 @@
     <string name="recorder_idle">点击下方按钮开始录音</string>
     <string name="recorder_audio_read_need">需要访问音频文件权限</string>
     <string name="recorder_audio_read_rationale">读取录音列表需要访问设备上的音频文件，请在系统弹窗中允许。</string>
+
+    <!-- 笔记页面 -->
+    <string name="btn_note">笔记</string>
+    <string name="title_note">笔记</string>
+    <string name="note_new">新笔记</string>
+    <string name="note_new_short">＋ 新笔记</string>
+    <string name="note_empty_hint">还没有笔记\n点击左上角 + 新笔记</string>
+    <string name="note_delete_title">删除笔记</string>
+    <string name="note_delete_message">确定要删除「%1$s」吗？</string>
+    <string name="note_delete_confirm">删除</string>
+    <string name="note_delete_cancel">取消</string>
+    <string name="note_format_bold">加粗</string>
+    <string name="note_format_italic">斜体</string>
+    <string name="note_format_image">插图</string>
+    <string name="note_save_fail">保存失败</string>
+    <string name="note_image_insert_fail">图片插入失败</string>
+    <string name="note_image_too_large">图片过大，无法添加</string>
+    <string name="note_default_title">新笔记</string>
+
+    <!-- 云音乐 → 播放页 / mini player -->
+    <string name="music_player_title">正在播放</string>
+    <string name="music_player_loading">加载中…</string>
+    <string name="music_player_lyric_empty">暂无歌词</string>
+    <string name="music_player_mode_normal">列表循环</string>
+    <string name="music_player_mode_loop">列表循环</string>
+    <string name="music_player_mode_repeat_one">单曲循环</string>
+    <string name="music_player_mode_shuffle">随机播放</string>
+    <string name="music_player_prev">上一首</string>
+    <string name="music_player_next">下一首</string>
+    <string name="music_player_play">播放</string>
+    <string name="music_player_pause">暂停</string>
+    <string name="music_player_toggle_lyric">切换歌词</string>
+    <string name="music_play_song_unavailable">该歌曲暂不可播放</string>
+    <string name="music_play_check_fail">歌曲可用性检查失败：%1$s</string>
+    <string name="music_play_url_fail">获取播放链接失败：%1$s</string>
+    <string name="music_daily_load_fail">加载日推失败</string>
+    <string name="music_playlist_load_fail">加载歌单失败</string>
+    <string name="music_playlist_detail_title">歌单</string>
+    <string name="music_playlist_detail_placeholder">歌单详情暂未对接\n正在播日推</string>
+    <string name="music_playlist_detail_play_daily">播日推</string>
+    <string name="music_mini_play">播放</string>
+    <string name="music_mini_pause">暂停</string>
+    <string name="music_mini_next">下一首</string>
+
+    <!-- 问 AI：收藏功能完整化 -->
+    <string name="ai_bookmark_empty_conv">请先发起对话再收藏</string>
+    <string name="ai_bookmark_default_title">AI 对话</string>
+    <string name="ai_bookmark_view_title">我的收藏</string>
+    <string name="ai_bookmark_view_entry">我的收藏</string>
+    <string name="ai_bookmark_view_entry_count">(%1$d)</string>
+    <string name="ai_bookmark_view_empty">还没有收藏</string>
+    <string name="ai_bookmark_view_empty_hint">在 AI 对话中点击右上角书签即可加入收藏</string>
+    <string name="ai_bookmark_view_date_format">%1$s</string>
+    <string name="ai_bookmark_view_deleted">对话已删除</string>
+    <string name="ai_bookmark_view_delete_title">删除收藏</string>
+    <string name="ai_bookmark_view_delete_message">确定要删除这条收藏吗？</string>
+    <string name="ai_bookmark_view_delete_confirm">删除</string>
+    <string name="ai_bookmark_view_delete_cancel">取消</string>
+    <string name="ai_bookmark_view_conv_deleted">原对话已不存在</string>
 </resources>

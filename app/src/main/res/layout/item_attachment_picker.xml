@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    附件选择器网格卡片：横向布局（图标在左，名称在右）。
+    - 宽 match_parent（GridLayoutManager 4 列自动均分）
+    - 高 56dp：词典笔窄长横屏上的列表行高，与项目内 56dp 单行列表项保持一致
+    - 内边距 12dp：左图标与右名称都留 12dp 边距，避免贴边
+    - 背景：bg_topbar_btn（圆角 12dp 灰底，按下更亮一档）
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:layout_margin="4dp"
+    android:background="@drawable/bg_topbar_btn"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@null"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/ai_text_primary"
+        android:textSize="14sp" />
+</LinearLayout>

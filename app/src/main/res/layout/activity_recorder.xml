@@ -20,36 +20,66 @@
         android:background="@color/recorder_sidebar_bg"
         android:orientation="vertical">
 
-        <!-- 顶部「＋新录音」按钮 -->
+        <!--
+            顶部工具栏：左 40×40 灰底返回按钮 + 占满剩余空间的「＋新录音」灰底按钮。
+            仿问 AI 页面 toolbarLayout 的 40×40 灰底样式（bg_topbar_btn：level-1 → 按下 level-2）。
+        -->
         <LinearLayout
-            android:id="@+id/btnNewRecording"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
+            android:orientation="horizontal">
 
+            <!-- 返回（仿问 AI 顶部按钮） -->
             <ImageView
-                android:id="@+id/ivNew"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_plus"
+                android:id="@+id/btnRecorderBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_topbar_btn"
+                android:clickable="true"
+                android:contentDescription="@string/recorder_back"
+                android:focusable="true"
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_arrow_left"
                 app:tint="@color/recorder_text_primary" />
 
-            <TextView
-                android:id="@+id/tvNewLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <!-- ＋新录音：占满剩余宽度 -->
+            <LinearLayout
+                android:id="@+id/btnNewRecording"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="8dp"
-                android:text="@string/recorder_new"
-                android:textColor="@color/recorder_text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_weight="1"
+                android:background="@drawable/bg_topbar_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:id="@+id/ivNew"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_plus"
+                    app:tint="@color/recorder_text_primary" />
+
+                <TextView
+                    android:id="@+id/tvNewLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/recorder_new"
+                    android:textColor="@color/recorder_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- 分隔线 -->

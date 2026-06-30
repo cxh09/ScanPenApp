@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  笔记列表项图标：笔记本 + 铅笔。
+  - 24dp viewport，单色描边。
+  - 默认 tint 在使用时由 layout 通过 android:tint 指定。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 笔记本主体（带左侧装订点） -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M6,4 L17,4 C18.1,4 19,4.9 19,6 L19,18 C19,19.1 18.1,20 17,20 L6,20 C4.9,20 4,19.1 4,18 L4,6 C4,4.9 4.9,4 6,4 Z" />
+    <!-- 装订线 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M8,4 L8,20" />
+    <!-- 文本横线 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.2"
+        android:strokeLineCap="round"
+        android:pathData="M11,8 L17,8 M11,12 L17,12 M11,16 L15,16" />
+    <!-- 铅笔（斜对角叠加） -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M19.5,2.5 L21.5,4.5 L13.5,12.5 L11.5,12.5 L11.5,10.5 Z" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#000000"
+        android:strokeWidth="0.6"
+        android:pathData="M11.5,10.5 L11.5,12.5 L13.5,12.5" />
+</vector>

@@ -5,6 +5,7 @@
     - 主体：ScrollView + TextView（18sp / 次级行距 / textIsSelectable 支持长按选择复制）
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/ai_chat_bg"
@@ -17,26 +18,43 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
+        <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
+            android:contentDescription="@string/ai_fullscreen_back"
             android:focusable="true"
-            android:gravity="center"
-            android:minWidth="48dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:text="@string/ai_fullscreen_back"
-            android:textColor="@color/ai_text_primary"
-            android:textSize="14sp" />
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_left"
+            app:tint="@color/ai_text_primary" />
+
+        <!--
+            收藏按钮：40×40dp 灰底圆角，点击写入 BookmarkStore。
+            - 紧贴「← 返回」右侧，挤占 tvTitle 空间；tvTitle 走 weight=1 + ellipsize=end 仍能完整显示对话标题
+            - 不持久化高亮态：每次进入全屏页都显示「未收藏」外观
+        -->
+        <ImageView
+            android:id="@+id/btnBookmark"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="4dp"
+            android:background="@drawable/bg_topbar_btn"
+            android:clickable="true"
+            android:contentDescription="@string/ai_topbar_bookmark"
+            android:focusable="true"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_bookmark_outline"
+            app:tint="@color/ai_text_primary" />
 
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"

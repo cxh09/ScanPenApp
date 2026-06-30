@@ -13,9 +13,22 @@
     -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <!--
+        读取 MediaStore.Images：API ≥ 33 (Android 13) 用 READ_MEDIA_IMAGES 查 ScanAppCamera 相册；
+        API ≤ 32 走 READ_EXTERNAL_STORAGE（已在上面声明）。
+    -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!--
+        自定义文件浏览器 AttachmentPickerActivity 需要直接遍历 /storage/emulated/0/。
+        - API ≥ 30：用 MANAGE_EXTERNAL_STORAGE 跳过 scoped storage（词典笔属于本机自营设备，授权流程简化）
+        - API ≤ 29：走原有的 READ_EXTERNAL_STORAGE
+        tools:ignore="ScopedStorage" 显式声明豁免，符合 manifest 规则
+    -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <application
+        android:name=".ScanPenApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -23,7 +36,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ScanPenApp">
+        android:theme="@style/Theme.ScanPenApp"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".MainActivity"
@@ -41,6 +55,37 @@
             android:label="@string/title_ask_ai"
             android:screenOrientation="landscape" />
 
+        <!--
+            技能运行页（灵动表达 / 翻译 / 写作）：从 AskAiActivity 技能 BottomSheet 启动。
+            - 单轮 system + user，无多轮上下文与附件
+            - 强制横屏
+            - exported=false：仅本应用内 AskAiActivity 启动
+        -->
+        <activity
+            android:name=".LivelyActivity"
+            android:exported="false"
+            android:label="@string/ai_skill_lively_name"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".TranslateActivity"
+            android:exported="false"
+            android:label="@string/ai_skill_translate_name"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".WritingActivity"
+            android:exported="false"
+            android:label="@string/ai_skill_writing_name"
+            android:screenOrientation="landscape" />
+
+        <!-- 技能「关于」页：技能 logo / 名称 / 介绍 / 作者 -->
+        <activity
+            android:name=".SkillAboutActivity"
+            android:exported="false"
+            android:label="@string/skill_about_topbar_title"
+            android:screenOrientation="landscape" />
+
         <!-- AI 回答全屏查看页：双击 AI 回答气泡跳转，关闭后回到 AskAiActivity -->
         <activity
             android:name=".AiMessageFullscreenActivity"
@@ -52,6 +97,13 @@
             android:name=".MicroChatActivity"
             android:exported="false"
             android:label="@string/title_micro_chat"
+            android:screenOrientation="landscape" />
+
+        <!-- 收藏夹列表页：从 AskAiActivity 侧边栏底部入口启动，强制横屏 -->
+        <activity
+            android:name=".BookmarkListActivity"
+            android:exported="false"
+            android:label="@string/ai_bookmark_view_title"
             android:screenOrientation="landscape" />
 
         <activity
@@ -101,9 +153,131 @@
             android:exported="false"
             android:screenOrientation="landscape" />
 
+        <!--
+            ScanAppCamera 应用内相册：从 CameraActivity 「相册」按钮启动
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".CameraAlbumActivity"
+            android:exported="false"
+            android:label="@string/camera_album_title"
+            android:screenOrientation="landscape" />
+
+        <!--
+            相机照片全屏查看页：从 CameraAlbumActivity 缩略图点击启动
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".CameraPhotoViewerActivity"
+            android:exported="false"
+            android:label="@string/camera_viewer_title"
+            android:screenOrientation="landscape" />
+
         <activity
             android:name=".RecorderActivity"
             android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <!--
+            云音乐页：从 MainActivity 主页入口启动
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".MusicActivity"
+            android:exported="false"
+            android:label="@string/title_yinyue"
+            android:screenOrientation="landscape" />
+
+        <!--
+            云音乐 → 服务器设置页：从 MusicActivity 顶部设置按钮启动
+            - 填写服务器地址 + 端口，保存到 SharedPreferences
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".MusicServerSettingsActivity"
+            android:exported="false"
+            android:label="@string/music_settings_title"
+            android:screenOrientation="landscape" />
+
+        <!--
+            云音乐 → 二维码登录页：从 MusicActivity 「账号登录」按钮启动
+            - 调 /login/qr/key + /login/qr/create + 轮询 /login/qr/check
+            - 登录成功后写入 SharedPreferences 并关闭，回到 MusicActivity 时顶栏变为「已登录」
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".MusicLoginActivity"
+            android:exported="false"
+            android:label="@string/music_login_title"
+            android:screenOrientation="landscape" />
+
+        <!--
+            云音乐 → 搜索结果页（2 列网格）：从 MusicActivity 顶栏搜索按钮启动
+            - 接收 EXTRA_KEYWORD 作为初始关键词
+            - 调 /search?keywords=... 走与 MusicApi 共享的客户端
+            - 登录 cookie 透传（来自 MusicSession）
+            - exported=false：仅本应用内 MusicActivity 启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".MusicSearchActivity"
+            android:exported="false"
+            android:label="@string/music_search_title"
+            android:screenOrientation="landscape" />
+
+        <!--
+            云音乐 → 全屏播放页：从 MusicActivity 底部 mini player 点击中间区域启动
+            - 接管 [MusicPlayer] 状态展示：进度 / 模式 / 歌词 / 上下首
+            - finish() 不停止播放（由 MusicPlayer 跨 Activity 持有）
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".MusicPlayerActivity"
+            android:exported="false"
+            android:label="@string/music_player_title"
+            android:screenOrientation="landscape" />
+
+        <!--
+            云音乐 → 歌单详情页（占位壳）：从 MusicActivity 左侧「我的歌单」点击启动
+            - 本期为占位：显示「歌单详情暂未对接」+ 「播日推」按钮
+            - 真实接入 [/playlist/detail] 后再填实
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".MusicPlaylistDetailActivity"
+            android:exported="false"
+            android:label="@string/music_playlist_detail_title"
+            android:screenOrientation="landscape" />
+
+        <!--
+            笔记页：从 MainActivity 主页入口启动
+            - 顶栏「＋ 新笔记」+ 左列表 + 右编辑（加粗 / 斜体 / 插图）
+            - exported=false：仅本应用内启动
+            - 强制横屏
+        -->
+        <activity
+            android:name=".NoteListActivity"
+            android:exported="false"
+            android:label="@string/title_note"
+            android:screenOrientation="landscape" />
+
+        <!--
+            自定义文件浏览器：替代系统 SAF（Storage Access Framework）。
+            - 入口：AskAiActivity 底部输入栏 + 按钮 → 1×4 入口 BottomSheet → 启动本 Activity
+            - Intent extra：EXTRA_START_PATH 决定根目录（如 /storage/emulated/0/）
+            - 强制横屏、exported=false：仅本应用内 AskAiActivity 启动
+        -->
+        <activity
+            android:name=".AttachmentPickerActivity"
+            android:exported="false"
+            android:label="@string/attach_picker_title"
             android:screenOrientation="landscape" />
 
         <!--

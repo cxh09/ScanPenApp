@@ -21,21 +21,22 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- 顶部栏：返回 + 标题 + 新建配置按钮 -->
-        <TextView
+        <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_topbar_btn"
             android:clickable="true"
+            android:contentDescription="@string/ai_topbar_back"
             android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:text="@string/ai_settings_back"
-            android:textColor="@color/ai_input_focus_border"
-            android:textSize="14sp"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_left"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/ai_text_primary" />
 
         <TextView
             android:id="@+id/tvSidebarTitle"
@@ -51,27 +52,23 @@
             app:layout_constraintStart_toEndOf="@id/btnBack"
             app:layout_constraintTop_toTopOf="@id/btnBack" />
 
-        <!-- 顶部栏右侧：新建配置按钮（灰底圆角 + 号） -->
-        <FrameLayout
+        <!-- 顶部栏右侧：新建配置按钮（与问 AI 顶部按钮同款：40dp 圆角灰底 + 24dp 图标） -->
+        <ImageView
             android:id="@+id/btnAddModel"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/bg_btn_new_chat"
+            android:background="@drawable/bg_topbar_btn"
             android:clickable="true"
+            android:contentDescription="@string/ai_settings_add_model"
             android:focusable="true"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_plus"
             app:layout_constraintBottom_toBottomOf="@id/btnBack"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/btnBack">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/ai_settings_add_model"
-                android:src="@drawable/ic_plus"
-                app:tint="@color/ai_text_primary" />
-        </FrameLayout>
+            app:layout_constraintTop_toTopOf="@id/btnBack"
+            app:tint="@color/ai_text_primary" />
 
         <View
             android:id="@+id/sidebarDivider"

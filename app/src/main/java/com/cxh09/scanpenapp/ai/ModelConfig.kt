@@ -6,7 +6,7 @@ package com.cxh09.scanpenapp.ai
  *
  * - [id] 全局唯一（UUID 字符串），切换/删除/编辑都按 id 寻址。
  * - [name] 用户可改的别名（如「GPT-4o」「DeepSeek」），仅用于 UI 展示。
- * - [apiKey] / [baseUrl] / [model] / [thinkingMode] 与 [ApiConfig] 4 字段一一对应，
+ * - [apiKey] / [baseUrl] / [model] 与 [ApiConfig] 3 字段一一对应，
  *   通过 [toApiConfig] 转成旧接口继续给 [OpenAiClientHolder] 使用，避免改动发送路径。
  */
 data class ModelConfig(
@@ -15,7 +15,6 @@ data class ModelConfig(
     val apiKey: String,
     val baseUrl: String,
     val model: String,
-    val thinkingMode: Boolean = false,
 ) {
     val isComplete: Boolean
         get() = apiKey.isNotBlank() && model.isNotBlank()
@@ -25,6 +24,5 @@ data class ModelConfig(
         apiKey = apiKey,
         baseUrl = baseUrl,
         model = model,
-        thinkingMode = thinkingMode,
     )
 }

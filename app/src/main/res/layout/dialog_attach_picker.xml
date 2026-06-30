@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    问 AI「+」面板 BottomSheet 内容（1×2 横排卡片）：
+    - 顶部 4dp 把手柄（与 dialog_skills 同款）
+    - 标题
+    - 1×2 横排卡片：左「📁 文件」+ 右「📷 拍照」，各占 weight=1
+    - 圆角仅顶部 12dp（BottomSheetDialog 自身已处理底部贴近屏幕）
+    - 背景 surface/level-2
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="20dp">
+
+    <!-- 把手柄：居中 4×32dp 圆条 -->
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/ai_sidebar_divider" />
+
+    <!-- 标题行 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/attach_pick_title"
+        android:textColor="@color/ai_text_primary"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <!-- 1×2 横排卡片：文件 / 拍照 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="16dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <!-- 卡片 1：文件 -->
+        <include
+            android:id="@+id/entryFile"
+            layout="@layout/item_attach_entry" />
+
+        <View
+            android:layout_width="10dp"
+            android:layout_height="match_parent" />
+
+        <!-- 卡片 2：拍照 -->
+        <include
+            android:id="@+id/entryCamera"
+            layout="@layout/item_attach_entry" />
+
+    </LinearLayout>
+
+</LinearLayout>

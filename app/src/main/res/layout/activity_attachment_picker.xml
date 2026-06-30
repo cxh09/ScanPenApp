@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    自建附件选择器（替代系统 SAF）：
+    - 顶栏 48dp：图标返回按钮（与问AI页 btnTopbarBack 样式一致）+ 面包屑（当前路径）+ 1dp 分隔线
+    - 主体：RecyclerView 4 列网格，每格 80×80dp 卡片
+    - 空态 / 无权限态：居中两行文案（与 RecyclerView 互斥）
+    - 深色主题，颜色全部 @color/ai_*，字符串全部 @string/attach_*
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ai_chat_bg"
+    android:orientation="vertical">
+
+    <!-- 顶部工具栏 48dp -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/ai_sidebar_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/bg_topbar_btn"
+            android:clickable="true"
+            android:contentDescription="@string/ai_topbar_back"
+            android:focusable="true"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_left"
+            app:tint="@color/ai_text_primary" />
+
+        <TextView
+            android:id="@+id/tvBreadcrumb"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="start"
+            android:maxLines="1"
+            android:paddingEnd="16dp"
+            android:textColor="@color/ai_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="内部存储" />
+    </LinearLayout>
+
+    <!-- 1dp 分隔线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/ai_sidebar_divider" />
+
+    <!-- 主体：RecyclerView 网格 + 空态 / 无权限态 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFiles"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:overScrollMode="ifContentScrolls"
+            android:padding="8dp"
+            android:scrollbars="none"
+            tools:listitem="@layout/item_attachment_picker" />
+
+        <LinearLayout
+            android:id="@+id/emptyContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/attach_picker_empty"
+                android:textColor="@color/ai_text_primary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvEmptyHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/attach_picker_need_permission"
+                android:textColor="@color/ai_text_tertiary"
+                android:textSize="13sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

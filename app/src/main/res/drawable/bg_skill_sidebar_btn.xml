@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    技能页侧边栏按钮背景（#1A1A1A 暗灰卡片）
+    - default：skill_sidebar_btn_bg（#1A1A1A）
+    - pressed：skill_sidebar_btn_bg_pressed（#2A2A2A，按下一档，更亮一档）
+    - 圆角 8dp：与卡片、按钮统一圆角风格
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/skill_sidebar_btn_bg_pressed" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/skill_sidebar_btn_bg" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</selector>

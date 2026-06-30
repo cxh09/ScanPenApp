@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Content copy icon (Lucide copy)
+    双层矩形错位的复制图标（Lucide 风格）
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="@color/text_primary">
+    <!-- 内部圆角矩形 14x14 @ (8,8)，圆角 2 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M10,8 H20 A2,2 0 0 1 22,10 V20 A2,2 0 0 1 20,22 H10 A2,2 0 0 1 8,20 V10 A2,2 0 0 1 10,8 Z"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <!-- 外部折线：从左下 (4,16) 向上 + 横向 + 折回到 (16,4) 的开口轮廓 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M4,16 C2.9,16 2,15.1 2,14 V4 C2,2.9 2.9,2 4,2 H14 C14.9,2 16,2.9 16,4"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+</vector>

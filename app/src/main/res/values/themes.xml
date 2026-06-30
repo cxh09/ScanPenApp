@@ -18,11 +18,18 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
+    <!-- AlertDialog 按钮：显式覆盖 textColor，避免 Activity 主题里浅色 textColorPrimary
+         透过 abc_btn_colored_text_material / abc_btn_borderless_text_material
+         状态色泄漏到按钮上。父样式继承自 AppCompat 默认无边框按钮，保留涟漪与按压态。 -->
+    <style name="Widget.ScanPenApp.Button.Borderless" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
     <!-- 深色 AlertDialog：用于长按历史删除提示等场景，与全站深色 UI 对齐
          父样式 Theme.AppCompat.Dialog.Alert 是 androidx.appcompat 提供的标准 AlertDialog 主题，
          显式覆盖背景色与文字色即可得到深色效果，避免依赖不存在的 Material 父样式。
-         按钮文字由 colorAccent 控制（正按钮）和 textColorPrimary 控制（负按钮），
-         都设为白色确保在深色背景上清晰可见。 -->
+         按钮文字由 buttonBar*ButtonStyle 指向 Widget.ScanPenApp.Button.Borderless 统一为白色，
+         不再依赖 colorAccent / textColorPrimary（这两个会被 Activity 主题的状态色覆盖）。 -->
     <style name="Theme.ScanPenApp.AlertDialog.Dark" parent="Theme.AppCompat.Dialog.Alert">
         <item name="colorAccent">@color/white</item>
         <item name="android:windowBackground">@color/ai_dialog_bg</item>
@@ -30,6 +37,26 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>
         <item name="android:colorBackground">@color/ai_dialog_bg</item>
+        <!-- 三个按钮槽位都覆盖，统一正/负/中性按钮文字为白色 -->
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.ScanPenApp.Button.Borderless</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.ScanPenApp.Button.Borderless</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.ScanPenApp.Button.Borderless</item>
+    </style>
+
+    <!-- 深色 BottomSheetDialog：与全站深色 UI 对齐。
+         父样式 Theme.MaterialComponents.Light.BottomSheetDialog 是 Material 库提供的 BottomSheetDialog 主题，
+         覆盖 backgroundDimmed / bottomSheetStyle 后即可让 BottomSheet 自身背景透明（让 sheet 内容自带的 bg_bottom_sheet.xml 接管圆角）
+         ，并与 AlertDialog 深色背景同色。 -->
+    <style name="Theme.ScanPenApp.BottomSheetDialog" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.ScanPenApp.BottomSheet</item>
+        <item name="android:navigationBarColor">@color/surface_level_2</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- BottomSheet 内容容器样式：背景透明，让 dialog_skills.xml 自带的圆角 shape 生效。 -->
+    <style name="Widget.ScanPenApp.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
     </style>
 
     <!-- 关于本机页面：分组标题 -->

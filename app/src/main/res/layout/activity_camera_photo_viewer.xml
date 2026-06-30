@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    相机照片全屏查看页（横屏 1:4）：
+    - 顶部 48dp 工具栏：「← 返回」+ 标题 + 1dp 分隔线
+    - 主体：FrameLayout 装 ImageView（fitCenter，黑底透出）
+    - 深色主题，颜色全部 @color/*，字符串全部 @string/*
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_base"
+    android:orientation="vertical">
+
+    <!-- 顶部工具栏：48dp，sidebar 背景 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/ai_sidebar_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/ai_fullscreen_back"
+            android:focusable="true"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_arrow_left"
+            app:tint="@color/ai_text_primary" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:text="@string/camera_viewer_title"
+            android:textColor="@color/ai_text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 工具栏与主体之间的 1dp 分隔线 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/ai_sidebar_divider" />
+
+    <!-- 主体：FrameLayout 装全屏 ImageView（fitCenter，黑底透出） -->
+    <FrameLayout
+        android:id="@+id/contentRoot"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/bg_base"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:id="@+id/ivPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/bg_base"
+            android:contentDescription="@string/camera_viewer_title"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+</LinearLayout>

@@ -28,38 +28,79 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- 新对话按钮 -->
+            <!--
+                顶部 4 按钮：返回 / 新对话 / 收藏 / 安全发送。占位在原「+ 新对话」位置。
+                - 外层横向 LinearLayout 撑满可用宽度（margin 12dp × 2 + 40×4 + 8×3 = 184dp，塞入 220dp sidebar 居中留 18dp 边距）
+                - 按钮 40×40dp 圆角 12dp 灰底，padding 8dp 让图标实际显示 24dp
+                - 四个按钮 id 保留为 btnTopbarBack / btnTopbarNewChat / btnTopbarBookmark / btnTopbarShield，Kotlin 侧不需要改
+            -->
             <LinearLayout
-                android:id="@+id/btnNewChat"
+                android:id="@+id/toolbarLayout"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/bg_btn_new_chat"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center"
+                android:layout_marginEnd="12dp"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:contentDescription="@null"
+                    android:id="@+id/btnTopbarBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_topbar_btn"
+                    android:clickable="true"
+                    android:contentDescription="@string/ai_topbar_back"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_arrow_left"
+                    app:tint="@color/ai_text_primary" />
+
+                <ImageView
+                    android:id="@+id/btnTopbarNewChat"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_topbar_btn"
+                    android:clickable="true"
+                    android:contentDescription="@string/ai_topbar_new_chat"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
                     android:src="@drawable/ic_plus"
                     app:tint="@color/ai_text_primary" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/btnTopbarBookmark"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginStart="8dp"
-                    android:text="@string/ai_new_chat"
-                    android:textColor="@color/ai_text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:background="@drawable/bg_topbar_btn"
+                    android:clickable="true"
+                    android:contentDescription="@string/ai_topbar_bookmark"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_bookmark_outline"
+                    app:tint="@color/ai_text_primary" />
+
+                <ImageView
+                    android:id="@+id/btnTopbarShield"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_topbar_btn"
+                    android:clickable="true"
+                    android:contentDescription="@string/ai_topbar_shield"
+                    android:focusable="true"
+                    android:padding="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_shield_send"
+                    app:tint="@color/ai_text_primary" />
 
             </LinearLayout>
 
@@ -74,7 +115,7 @@
                 android:background="@color/ai_sidebar_divider"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/btnNewChat" />
+                app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
 
             <!-- 历史对话 标题 -->
             <TextView
@@ -102,44 +143,11 @@
                 android:overScrollMode="always"
                 android:paddingBottom="8dp"
                 android:scrollbars="none"
-                app:layout_constraintBottom_toTopOf="@id/settingsRow"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvHistoryTitle"
                 tools:listitem="@layout/item_chat_history" />
-
-            <!-- 设置入口 -->
-            <LinearLayout
-                android:id="@+id/settingsRow"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_key"
-                    app:tint="@color/ai_text_secondary" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/ai_settings_entry"
-                    android:textColor="@color/ai_text_secondary"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -215,7 +223,7 @@
                     android:paddingBottom="4dp" />
             </HorizontalScrollView>
 
-            <!-- 底部输入栏：单行 输入框 | 思考 | 模型 | 加号 | 发送 -->
+            <!-- 底部输入栏：单行 输入框 | 模型 | 加号 | 发送 -->
             <LinearLayout
                 android:id="@+id/inputBar"
                 android:layout_width="0dp"
@@ -246,23 +254,6 @@
                     android:textColorHint="@color/ai_text_tertiary"
                     android:textSize="14sp"
                     tools:ignore="Autofill,LabelFor" />
-
-                <TextView
-                    android:id="@+id/btnQuick"
-                    android:layout_width="wrap_content"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="4dp"
-                    android:background="@drawable/bg_ai_thinking_toggle"
-                    android:clickable="true"
-                    android:drawableStart="@drawable/ic_bulb"
-                    android:drawablePadding="4dp"
-                    android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:text="@string/ai_thinking"
-                    android:textColor="@color/ai_text_primary"
-                    android:textSize="14sp" />
 
                 <!-- 模型选择按钮（点击打开右抽屉） -->
                 <TextView
@@ -411,6 +402,43 @@
                 android:textSize="13sp"
                 android:visibility="gone" />
         </FrameLayout>
+
+        <!-- 抽屉底部：API 设置入口（与原左侧侧边栏同款，迁移到模型抽屉下方） -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@color/ai_sidebar_divider" />
+
+        <LinearLayout
+            android:id="@+id/settingsRow"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_key"
+                app:tint="@color/ai_text_secondary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/ai_settings_entry"
+                android:textColor="@color/ai_text_secondary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

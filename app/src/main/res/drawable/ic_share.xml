@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Share icon (Lucide share-2)
+    三节点 + 折线分享图标
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="@color/text_primary">
+    <!-- Top circle at (18,5) -->
+    <path
+        android:fillColor="?attr/colorControlNormal"
+        android:pathData="M18,5 m-2,0 a2,2 0 1 0 4,0 a2,2 0 1 0 -4,0"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <!-- Left circle at (6,12) -->
+    <path
+        android:fillColor="?attr/colorControlNormal"
+        android:pathData="M6,12 m-2,0 a2,2 0 1 0 4,0 a2,2 0 1 0 -4,0"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <!-- Bottom circle at (18,19) -->
+    <path
+        android:fillColor="?attr/colorControlNormal"
+        android:pathData="M18,19 m-2,0 a2,2 0 1 0 4,0 a2,2 0 1 0 -4,0"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+    <!-- Connecting line: top-right to left -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M8.59,13.51 l5.83,-5.83 M15.41,15.49 l-5.83,5.83"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="2" />
+</vector>

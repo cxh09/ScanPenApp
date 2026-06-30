@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  笔记主页（横屏 1:4）：
+  - 顶部 32dp 工具栏：左侧「＋ 新笔记」按钮（关键：放在左上角）+ 中部标题「笔记」+ 右侧空占位
+  - 工具栏与主体之间 1dp 分隔线
+  - 主体 horizontal：
+      左侧 ListView（笔记列表，weight=2，bg_base，padding 8dp）
+      1dp 竖分隔线
+      右侧 LinearLayout（weight=3）：标题 EditText + 正文 EditText + 工具栏（3 个 ImageButton：加粗 / 斜体 / 插图）
+  - 深色主题，颜色全部 @color/note_*，字符串全部 @string/note_*
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/note_sidebar_bg"
+    android:orientation="vertical">
+
+    <!-- 顶部工具栏：32dp，左侧「＋ 新笔记」 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:background="@color/note_sidebar_bg"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnNewNote"
+            android:layout_width="56dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_note_format_btn"
+            android:clickable="true"
+            android:contentDescription="@string/note_new"
+            android:focusable="true"
+            android:padding="4dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_plus"
+            app:tint="@color/note_text_primary" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="@string/title_note"
+            android:textColor="@color/note_text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- 右侧占位，保持顶栏布局对称 -->
+        <View
+            android:layout_width="56dp"
+            android:layout_height="32dp" />
+    </LinearLayout>
+
+    <!-- 工具栏与主体之间的 1dp 分隔线 -->
+    <View
+        android:id="@+id/toolbarDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/note_sidebar_divider" />
+
+    <!-- 主体：左侧列表（2/5）+ 竖分隔线 + 右侧编辑（3/5） -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <ListView
+            android:id="@+id/lvNotes"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@color/bg_base"
+            android:divider="@null"
+            android:listSelector="?attr/selectableItemBackground"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:scrollbars="none" />
+
+        <View
+            android:id="@+id/contentDivider"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/note_sidebar_divider" />
+
+        <FrameLayout
+            android:id="@+id/contentArea"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:background="@color/bg_base">
+
+            <!-- 编辑器：标题 + 正文 + 工具栏 -->
+            <LinearLayout
+                android:id="@+id/editorArea"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <!-- 标题：48dp，圆角编辑器底 -->
+                <EditText
+                    android:id="@+id/etTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_note_editor"
+                    android:fontFamily="sans-serif"
+                    android:hint="@string/note_new"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingStart="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="8dp"
+                    android:textColor="@color/note_text_primary"
+                    android:textColorHint="@color/note_text_tertiary"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <!-- 正文：撑满剩余空间 -->
+                <ScrollView
+                    android:id="@+id/svContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_note_editor"
+                    android:fillViewport="true"
+                    android:padding="4dp">
+
+                    <EditText
+                        android:id="@+id/etContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:fontFamily="sans-serif"
+                        android:gravity="top|start"
+                        android:lineSpacingExtra="4dp"
+                        android:padding="8dp"
+                        android:textColor="@color/note_text_primary"
+                        android:textColorHint="@color/note_text_tertiary"
+                        android:textIsSelectable="true"
+                        android:textSize="15sp" />
+                </ScrollView>
+
+                <!-- 工具栏：56dp，三个 ImageButton weight=1 -->
+                <LinearLayout
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_note_editor"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnBold"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_note_format_btn"
+                        android:clickable="true"
+                        android:contentDescription="@string/note_format_bold"
+                        android:focusable="true"
+                        android:padding="12dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_note_bold" />
+
+                    <ImageButton
+                        android:id="@+id/btnItalic"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_note_format_btn"
+                        android:clickable="true"
+                        android:contentDescription="@string/note_format_italic"
+                        android:focusable="true"
+                        android:padding="12dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_note_italic" />
+
+                    <ImageButton
+                        android:id="@+id/btnImage"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_note_format_btn"
+                        android:clickable="true"
+                        android:contentDescription="@string/note_format_image"
+                        android:focusable="true"
+                        android:padding="12dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_note_image" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 空态提示：默认 GONE，有数据时隐藏 -->
+            <TextView
+                android:id="@+id/tvEmptyHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:text="@string/note_empty_hint"
+                android:textColor="@color/note_text_tertiary"
+                android:textSize="15sp"
+                android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

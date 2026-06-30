@@ -44,6 +44,10 @@
     <!-- 长按历史删除提示等 Dialog 用的灰黑色背景 -->
     <color name="ai_dialog_bg">#1C1C1E</color>
 
+    <!-- 技能页侧边栏按钮：#1A1A1A 暗灰底 + #2A2A2A 按下一档（与原 surface/level-2 同档） -->
+    <color name="skill_sidebar_btn_bg">#1A1A1A</color>
+    <color name="skill_sidebar_btn_bg_pressed">#2A2A2A</color>
+
     <!-- 微聊页面专用色板（深色模式：纯黑背景 + 中性灰交互 + 浅色文字） -->
     <color name="chat_bg">#000000</color>
     <color name="chat_sidebar_bg">#0A0A0A</color>
@@ -95,4 +99,24 @@
     <color name="recorder_record_btn_pressed">#FF2A6A45</color>
     <color name="recorder_record_btn_recording">#FFA8443A</color>
     <color name="recorder_record_btn_recording_pressed">#FF7A2F28</color>
+
+    <!-- 笔记页面专用色板（深色模式：纯黑背景 + 中性灰交互 + 浅色文字） -->
+    <color name="note_sidebar_bg">#FF0A0A0A</color>
+    <color name="note_sidebar_divider">#FF1A1A1A</color>
+    <color name="note_text_primary">#FFE8E8ED</color>
+    <color name="note_text_tertiary">#FF8E8E93</color>
+    <color name="note_editor_bg">#FF1A1A1A</color>
+    <color name="note_item_normal">#FF1A1A1A</color>
+    <color name="note_item_selected">#FF2A2A2A</color>
+
+    <!-- 云音乐 → 播放页 / mini player 专用色板 -->
+    <color name="player_mini_bg">#FF1A1A1A</color>
+    <color name="player_mini_divider">#FF2A2A2A</color>
+    <color name="player_text_primary">#FFE8E8ED</color>
+    <color name="player_text_tertiary">#FF8E8E93</color>
+    <color name="player_cover_placeholder">#FF2A2A2A</color>
+    <color name="player_seekbar_tint">#FFE8E8ED</color>
+    <color name="player_lyric_highlight">#FFFFFFFF</color>
+    <color name="player_mode_active_tint">#FFE8E8ED</color>
+    <color name="player_mode_inactive_tint">#FF5A5A5E</color>
 </resources>

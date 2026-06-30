@@ -14,9 +14,9 @@
     android:layout_marginBottom="2dp"
     android:background="@drawable/bg_history_normal"
     android:minHeight="56dp"
-    android:paddingStart="12dp"
+    android:paddingStart="16dp"
     android:paddingTop="10dp"
-    android:paddingEnd="12dp"
+    android:paddingEnd="16dp"
     android:paddingBottom="10dp">
 
     <TextView

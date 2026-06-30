@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    切换摄像头图标：相机 + 循环箭头
+    - 24dp viewport，与项目内 ic_arrow_left / ic_close 风格一致
+    - stroke 风格，便于 tint 到 @color/text_secondary
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 相机主体（左上） -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M4,7 L7,7 L8.5,5 L15.5,5 L17,7 L20,7 A1,1 0 0 1 21,8 L21,16 A1,1 0 0 1 20,17 L4,17 A1,1 0 0 1 3,16 L3,8 A1,1 0 0 1 4,7 Z"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+
+    <!-- 相机镜头圆 -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M12,9.5 A2.5,2.5 0 1,0 12,14.5 A2.5,2.5 0 1,0 12,9.5 Z"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+
+    <!-- 循环箭头：右上半弧（顺时针） -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M18,4 L21,4 L21,7"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M21,4 A6,6 0 0 0 15,4"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+
+    <!-- 循环箭头：左下半弧（顺时针） -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M6,20 L3,20 L3,17"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M3,20 A6,6 0 0 0 9,20"
+        android:strokeColor="?attr/colorControlNormal"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="1.6" />
+</vector>

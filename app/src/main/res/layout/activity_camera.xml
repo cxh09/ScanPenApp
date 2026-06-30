@@ -1,130 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  相机页面：左侧 80dp 边栏 + 右侧 CameraX 预览
+  - 左侧 80dp 边栏：4 个 icon+text 按钮纵向均分 1/4 高度（退出 / 拍照 / 切换 / 相册）
+    背景统一 @drawable/bg_skill_sidebar_btn（圆角 8dp，按下态 level-1 → level-2）
+  - 右侧 PreviewView 区域：fitCenter 保持原始比例
+  - 整体背景 @color/bg_base
+  - 样式参考 activity_skill_run.xml sidebar 的 btnBack / btnSettings / btnAbout
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_base">
 
-    <!-- 顶部 32dp TopBar：左侧关闭，右侧居中标题 -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/topBar"
+    <!-- 相机主区：左侧 80dp 边栏 + 右侧预览 -->
+    <LinearLayout
+        android:id="@+id/cameraPanel"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:background="@color/bg_base"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/btnClose"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:drawablePadding="4dp"
-            android:drawableStart="@drawable/ic_close"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:text="@string/camera_close"
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/camera_title"
-            android:textColor="@color/text_primary"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- 中部相机预览 -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/previewView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/controlBar"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:scaleType="fillCenter" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- 底部 72dp 控制栏：切换 + 快门 + 相册 -->
-    <LinearLayout
-        android:id="@+id/controlBar"
-        android:layout_width="match_parent"
-        android:layout_height="72dp"
-        android:background="@color/surface_level_1"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <ImageView
-            android:id="@+id/btnSwitch"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/camera_switch"
-            android:focusable="true"
-            android:padding="12dp"
-            android:src="@drawable/ic_brightness"
-            app:tint="@color/text_secondary" />
-
-        <Space
-            android:layout_width="0dp"
+        <!-- 左侧 80dp 边栏：4 个按钮纵向均分 1/4 高度 -->
+        <LinearLayout
+            android:id="@+id/sidebar"
+            android:layout_width="80dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:background="@color/bg_base"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <!-- 按钮 1：退出（weight=1 顶住顶部 1/4 高度） -->
+            <LinearLayout
+                android:id="@+id/btnExit"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_skill_sidebar_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="6dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_close"
+                    app:tint="@color/text_primary" />
+            </LinearLayout>
+
+            <!-- 按钮 2：拍照（weight=1 顶住 2/4 高度） -->
+            <LinearLayout
+                android:id="@+id/btnShutter"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_skill_sidebar_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="6dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_camera"
+                    app:tint="@color/text_primary" />
+            </LinearLayout>
+
+            <!-- 按钮 3：切换前后摄像头（weight=1 顶住 3/4 高度） -->
+            <LinearLayout
+                android:id="@+id/btnSwitchCamera"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_skill_sidebar_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="6dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_camera_switch"
+                    app:tint="@color/text_primary" />
+            </LinearLayout>
+
+            <!-- 按钮 4：相册（weight=1 顶住底部 1/4 高度） -->
+            <LinearLayout
+                android:id="@+id/btnAlbum"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_skill_sidebar_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="6dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_image"
+                    app:tint="@color/text_primary" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 右侧预览区 -->
         <FrameLayout
-            android:id="@+id/btnShutter"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:background="@drawable/bg_camera_shutter"
-            android:clickable="true"
-            android:contentDescription="@string/camera_shutter_desc"
-            android:focusable="true">
-
-            <View
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:background="@drawable/bg_shutter_inner" />
-        </FrameLayout>
-
-        <Space
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:background="@color/bg_base">
 
-        <ImageView
-            android:id="@+id/btnGallery"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:contentDescription="@string/camera_gallery"
-            android:focusable="true"
-            android:padding="12dp"
-            android:src="@drawable/ic_image"
-            app:tint="@color/text_secondary" />
+            <androidx.camera.view.PreviewView
+                android:id="@+id/previewView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:scaleType="fitCenter" />
+        </FrameLayout>
     </LinearLayout>
 
-    <!-- 权限拒绝引导 panel（z-order 最高，覆盖全屏） -->
+    <!-- 权限拒绝引导 panel（z-order 最高，覆盖全屏，0.8 透明度黑色遮罩） -->
     <LinearLayout
         android:id="@+id/permissionPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000"
+        android:alpha="0.8"
+        android:background="@color/bg_base"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingHorizontal="32dp"

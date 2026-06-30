@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    单个技能卡片：用于 BottomSheet 内的横向一排 3 个技能。
+    - 等宽 3 列（外层 LinearLayout weight=1）
+    - 内含图标（28dp）+ 名称（14sp Medium）+ 描述（12sp，2 行省略）
+    - 背景 surface/level-1，圆角 12dp，pressed → level-2
+    - 高度统一：description 缺失 / 1 行 / 2 行时整体高度不抖动
+      → 强制 description 高度为 2 行 TextView 的高度（lineSpacingExtra 不依赖字体度量差异）
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:background="@drawable/bg_skill_card"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
+
+    <ImageView
+        android:id="@+id/ivSkillIcon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:contentDescription="@null"
+        android:scaleType="centerInside" />
+
+    <TextView
+        android:id="@+id/tvSkillName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="@color/ai_text_primary"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvSkillDesc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_horizontal"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textColor="@color/ai_text_secondary"
+        android:textSize="12sp" />
+
+</LinearLayout>

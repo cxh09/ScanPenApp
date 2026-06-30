@@ -29,8 +29,9 @@ import java.util.concurrent.Executors
  * - 使用 CameraX 1.4 (Preview + ImageCapture) 实现取景与拍照。
  * - 完整处理 CAMERA 运行时权限：未授权时通过 `requestCameraPermission` 拉起系统弹窗，
  *   拒绝后展示 `permissionPanel` 引导跳系统设置。
- * - 拍照结果通过 MediaStore 写入 DCIM/ScanPenApp 目录（API ≥ Q 自动 IS_PENDING 流程），
+ * - 拍照结果通过 MediaStore 写入 DCIM/ScanAppCamera 目录（API ≥ Q 自动 IS_PENDING 流程），
  *   不需要 WRITE_EXTERNAL_STORAGE 权限。
+ * - 左侧 80dp 边栏 4 按钮：退出 / 拍照 / 切换前后摄 / 相册（跳 CameraAlbumActivity）
  */
 class CameraActivity : AppCompatActivity() {
 
@@ -58,16 +59,18 @@ class CameraActivity : AppCompatActivity() {
 
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        binding.btnClose.setOnClickListener { finish() }
+        binding.btnExit.setOnClickListener { finish() }
         binding.btnShutter.setOnClickListener { takePhoto() }
-        binding.btnSwitch.setOnClickListener {
+        binding.btnSwitchCamera.setOnClickListener {
             lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK)
                 CameraSelector.LENS_FACING_FRONT
             else
                 CameraSelector.LENS_FACING_BACK
             bindCamera()
         }
-        binding.btnGallery.setOnClickListener { openSystemGallery() }
+        binding.btnAlbum.setOnClickListener {
+            startActivity(Intent(this, CameraAlbumActivity::class.java))
+        }
         binding.btnPermissionGoto.setOnClickListener { openAppSettings() }
 
         if (hasCameraPermission()) {
@@ -132,7 +135,7 @@ class CameraActivity : AppCompatActivity() {
             put(MediaStore.Images.Media.DISPLAY_NAME, name)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/ScanPenApp")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "DCIM/ScanAppCamera")
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             }
         }
@@ -154,7 +157,7 @@ class CameraActivity : AppCompatActivity() {
                         }
                         contentResolver.update(uri, update, null, null)
                     }
-                    Toast.makeText(this@CameraActivity, R.string.camera_saved, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@CameraActivity, R.string.camera_saved_to_album, Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onError(exc: ImageCaptureException) {
@@ -164,18 +167,6 @@ class CameraActivity : AppCompatActivity() {
                 }
             }
         )
-    }
-
-    private fun openSystemGallery() {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            startActivity(intent)
-        } catch (e: Exception) {
-            Log.w(TAG, "No gallery app", e)
-        }
     }
 
     private fun openAppSettings() {

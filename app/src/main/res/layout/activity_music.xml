@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    云音乐页面：仿照录音机页面的左右分栏布局
+    - 根 = LinearLayout(horizontal)
+    - 左侧 220dp 侧栏：顶部「返回 + 账号登录」工具栏 + 分隔线 + 我的歌单 RecyclerView + 空态
+    - 右侧主区：每日推荐
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_base"
+    android:orientation="horizontal">
+
+    <!-- ============ 左侧 220dp 侧栏 ============ -->
+    <LinearLayout
+        android:id="@+id/sidebar"
+        android:layout_width="220dp"
+        android:layout_height="match_parent"
+        android:background="@color/recorder_sidebar_bg"
+        android:orientation="vertical">
+
+        <!--
+            顶部工具栏：左 40×40 灰底返回 + 占满剩余宽度的「账号登录」按钮。
+            仿照录音机页面 btnRecorderBack / btnNewRecording 的 40×40 灰底样式（bg_topbar_btn）。
+        -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- 返回 -->
+            <ImageView
+                android:id="@+id/btnMusicBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_topbar_btn"
+                android:clickable="true"
+                android:contentDescription="@string/recorder_back"
+                android:focusable="true"
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_arrow_left"
+                app:tint="@color/recorder_text_primary" />
+
+            <!-- 账号登录：占满剩余宽度 -->
+            <LinearLayout
+                android:id="@+id/btnAccountLogin"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_topbar_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp">
+
+                <ImageView
+                    android:id="@+id/ivAccount"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_account"
+                    app:tint="@color/recorder_text_primary" />
+
+                <TextView
+                    android:id="@+id/tvAccountLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="@string/music_account_login"
+                    android:textColor="@color/recorder_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 设置按钮：跳转到服务器设置页 -->
+            <ImageView
+                android:id="@+id/btnMusicSettings"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_topbar_btn"
+                android:clickable="true"
+                android:contentDescription="@string/music_settings_title"
+                android:focusable="true"
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_settings"
+                app:tint="@color/recorder_text_primary" />
+        </LinearLayout>
+
+        <!-- 侧栏标题：我的歌单 -->
+        <TextView
+            android:id="@+id/tvPlaylistTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:text="@string/music_playlist"
+            android:textColor="@color/recorder_text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- 分隔线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            android:background="@color/recorder_sidebar_divider" />
+
+        <!-- 歌单列表：RecyclerView + 空态 -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPlaylists"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:overScrollMode="ifContentScrolls"
+                android:scrollbars="vertical"
+                tools:listitem="@layout/item_music_playlist" />
+
+            <TextView
+                android:id="@+id/tvPlaylistEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:text="@string/music_playlist_empty"
+                android:textColor="@color/recorder_text_tertiary"
+                android:textSize="13sp" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- ============ 右侧主区：每日推荐 / 搜索结果 + 底部 mini player ============ -->
+    <LinearLayout
+        android:id="@+id/mainArea"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/bg_base"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="16dp">
+
+            <!-- 搜索栏：左侧输入框 + 右侧搜索按钮 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etMusicSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_input"
+                    android:hint="@string/music_search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingStart="12dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="8dp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_tertiary"
+                    android:textSize="14sp"
+                    tools:ignore="Autofill,LabelFor" />
+
+                <ImageView
+                    android:id="@+id/btnMusicSearch"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_topbar_btn"
+                    android:clickable="true"
+                    android:contentDescription="@string/music_search_hint"
+                    android:focusable="true"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_primary" />
+            </LinearLayout>
+
+            <!-- 分割线 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/divider_strong" />
+
+            <!-- 歌曲列表（每日推荐 / 搜索结果共用） -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvDaily"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:overScrollMode="ifContentScrolls"
+                    android:scrollbars="vertical"
+                    tools:listitem="@layout/item_music_daily" />
+
+                <ProgressBar
+                    android:id="@+id/pbMusicLoading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/text_tertiary"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvDailyEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="@string/music_daily_empty"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="13sp" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!--
+            ============ mini player 常驻底部 56dp ============
+            - visibility=gone 默认隐藏；播放 / 暂停时显示
+            - 整体 clickable=true，点中间区域进全屏播放页
+        -->
+        <LinearLayout
+            android:id="@+id/miniPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_mini_player"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="8dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <!-- 左侧 40×40 圆形占位 -->
+            <ImageView
+                android:id="@+id/ivMiniCover"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_cover_placeholder"
+                android:contentDescription="@string/music_player_title"
+                android:scaleType="centerCrop"
+                android:src="@color/player_cover_placeholder" />
+
+            <!-- 中间：歌名 + 歌手 -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvMiniTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/player_text_primary"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText"
+                    tools:text="歌名" />
+
+                <TextView
+                    android:id="@+id/tvMiniArtist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/player_text_tertiary"
+                    android:textSize="12sp"
+                    tools:ignore="HardcodedText"
+                    tools:text="歌手" />
+            </LinearLayout>
+
+            <!-- 播放 / 暂停 -->
+            <ImageView
+                android:id="@+id/btnMiniPlayPause"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/bg_player_btn"
+                android:clickable="true"
+                android:contentDescription="@string/music_mini_play"
+                android:focusable="true"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_player_play"
+                app:tint="@color/player_text_primary" />
+
+            <!-- 下一首 -->
+            <ImageView
+                android:id="@+id/btnMiniNext"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/bg_player_btn"
+                android:clickable="true"
+                android:contentDescription="@string/music_mini_next"
+                android:focusable="true"
+                android:padding="4dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_player_next"
+                app:tint="@color/player_text_primary" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    歌词行 item：单行 TextView，padding 8dp 上下
+    - 默认 13sp tertiary；高亮时改为 15sp 主色 + bold（由代码控制）
+-->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="end"
+    android:gravity="center"
+    android:maxLines="1"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:textColor="@color/player_text_tertiary"
+    android:textSize="13sp" />

@@ -77,9 +77,11 @@ class ConversationStore(context: Context) {
         val msgsArray = json.getJSONArray("messages")
         val messages = (0 until msgsArray.length()).map { i ->
             val obj = msgsArray.getJSONObject(i)
+            // reasoning 与 saveConversation 端用 optString 兼容：缺失 / 空串都视作 null
             MessageRecord(
                 role = obj.getString("role"),
                 content = obj.getString("content"),
+                reasoning = obj.optString("reasoning").ifEmpty { null },
             )
         }
         return Conversation(
