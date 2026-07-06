@@ -46,6 +46,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <!--
+                    HOME + DEFAULT：让本应用出现在系统「主屏幕」选择列表中，
+                    可被选为默认 launcher（按 home 键回到 MainActivity）。
+                -->
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
