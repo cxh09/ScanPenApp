@@ -199,6 +199,11 @@ class MusicLoginActivity : AppCompatActivity() {
                         binding.btnMusicLoginRefresh.visibility = View.VISIBLE
                         return
                     }
+                    else -> {
+                        // 未知 / 非标准 code（如服务端返回 0 / 网络异常码），按「继续等待」处理，
+                        // 避免静默通过。MusicApi.qrCheck 内部透出原 code，不做归一化。
+                        setQrStatus("等待扫码 (${r.code})")
+                    }
                 }
             } catch (ce: CancellationException) {
                 throw ce

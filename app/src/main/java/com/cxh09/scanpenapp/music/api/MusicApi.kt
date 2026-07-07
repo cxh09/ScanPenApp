@@ -195,23 +195,7 @@ object MusicApi {
             throw MusicApiException("未登录或 cookie 已失效")
         }
         val profile = root.optJSONObject("profile")
-        return LoginStatusResult(
-            userId = account.optLong("id", 0L),
-            userName = account.optString("userName", ""),
-            accountType = account.optInt("type", 0),
-            vipType = account.optInt("vipType", 0),
-            createTime = account.optLong("createTime", 0L),
-            nickname = profile?.optString("nickname", "").orEmpty(),
-            avatarUrl = profile?.optString("avatarUrl", "").orEmpty(),
-            avatarImgId = profile?.optLong("avatarImgId", 0L) ?: 0L,
-            backgroundUrl = profile?.optString("backgroundUrl", "").orEmpty(),
-            signature = profile?.optString("signature", "").orEmpty(),
-            gender = profile?.optInt("gender", 0) ?: 0,
-            province = profile?.optInt("province", 0) ?: 0,
-            city = profile?.optInt("city", 0) ?: 0,
-            lastLoginTime = profile?.optLong("lastLoginTime", 0L) ?: 0L,
-            lastLoginIp = profile?.optString("lastLoginIP", "").orEmpty()
-        )
+        return parseLoginStatus(account, profile)
     }
 
     /**
@@ -335,26 +319,7 @@ object MusicApi {
             ?: throw MusicApiException("获取登录信息失败：响应缺少 data")
         val account = data.optJSONObject("account")
         val profile = data.optJSONObject("profile")
-
-        return LoginStatusResult(
-            // account
-            userId = account?.optLong("id", 0L) ?: 0L,
-            userName = account?.optString("userName", "").orEmpty(),
-            accountType = account?.optInt("type", 0) ?: 0,
-            vipType = account?.optInt("vipType", 0) ?: 0,
-            createTime = account?.optLong("createTime", 0L) ?: 0L,
-            // profile
-            nickname = profile?.optString("nickname", "").orEmpty(),
-            avatarUrl = profile?.optString("avatarUrl", "").orEmpty(),
-            avatarImgId = profile?.optLong("avatarImgId", 0L) ?: 0L,
-            backgroundUrl = profile?.optString("backgroundUrl", "").orEmpty(),
-            signature = profile?.optString("signature", "").orEmpty(),
-            gender = profile?.optInt("gender", 0) ?: 0,
-            province = profile?.optInt("province", 0) ?: 0,
-            city = profile?.optInt("city", 0) ?: 0,
-            lastLoginTime = profile?.optLong("lastLoginTime", 0L) ?: 0L,
-            lastLoginIp = profile?.optString("lastLoginIP", "").orEmpty()
-        )
+        return parseLoginStatus(account, profile)
     }
 
     /**
@@ -745,6 +710,46 @@ object MusicApi {
 
     // ---------------- 私有工具 ----------------
 
+    /**
+     * 安全地把 [stream] 的内容读完成字符串。
+     *
+     * - [stream] 为 `null` 时直接返回空串（处理 `HttpURLConnection.errorStream` 可能为 null 的场景），
+     *   避免 NPE；调用方后续在 `code !in 200..299` 路径上仍会抛 [MusicApiException]。
+     * - 非 null 时用 UTF-8 读取并自动关闭流。
+     */
+    private fun safeReadAll(stream: java.io.InputStream?): String {
+        if (stream == null) return ""
+        return BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8)).use { it.readText() }
+    }
+
+    /**
+     * 将 `/user/account` / `/login/status` 响应的 `account + profile` JSON 块映射为 [LoginStatusResult]。
+     *
+     * 两个端点响应结构略有不同（`/user/account` 把 account/profile 平铺在根节点；`/login/status` 嵌套在
+     * `data` 下），但字段语义完全相同，因此共用一段解析逻辑。
+     */
+    private fun parseLoginStatus(account: JSONObject?, profile: JSONObject?): LoginStatusResult {
+        return LoginStatusResult(
+            // ---- account ----
+            userId = account?.optLong("id", 0L) ?: 0L,
+            userName = account?.optString("userName", "").orEmpty(),
+            accountType = account?.optInt("type", 0) ?: 0,
+            vipType = account?.optInt("vipType", 0) ?: 0,
+            createTime = account?.optLong("createTime", 0L) ?: 0L,
+            // ---- profile ----
+            nickname = profile?.optString("nickname", "").orEmpty(),
+            avatarUrl = profile?.optString("avatarUrl", "").orEmpty(),
+            avatarImgId = profile?.optLong("avatarImgId", 0L) ?: 0L,
+            backgroundUrl = profile?.optString("backgroundUrl", "").orEmpty(),
+            signature = profile?.optString("signature", "").orEmpty(),
+            gender = profile?.optInt("gender", 0) ?: 0,
+            province = profile?.optInt("province", 0) ?: 0,
+            city = profile?.optInt("city", 0) ?: 0,
+            lastLoginTime = profile?.optLong("lastLoginTime", 0L) ?: 0L,
+            lastLoginIp = profile?.optString("lastLoginIP", "").orEmpty()
+        )
+    }
+
     private fun joinArtists(arr: org.json.JSONArray?): String {
         if (arr == null || arr.length() == 0) return ""
         val names = ArrayList<String>(arr.length())
@@ -794,7 +799,7 @@ object MusicApi {
         try {
             val code = conn.responseCode
             val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-            val text = BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8)).use { it.readText() }
+            val text = safeReadAll(stream)
             if (code !in 200..299) {
                 throw MusicApiException("HTTP $code: $urlStr")
             }
@@ -825,7 +830,7 @@ object MusicApi {
             conn.outputStream.use { it.write(formBody.toByteArray(StandardCharsets.UTF_8)) }
             val code = conn.responseCode
             val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-            val text = BufferedReader(InputStreamReader(stream, StandardCharsets.UTF_8)).use { it.readText() }
+            val text = safeReadAll(stream)
             if (code !in 200..299) {
                 throw MusicApiException("HTTP $code: $urlStr")
             }

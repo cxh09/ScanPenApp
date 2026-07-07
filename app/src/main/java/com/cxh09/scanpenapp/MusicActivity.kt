@@ -111,6 +111,11 @@ class MusicActivity : AppCompatActivity(), MusicPlayer.Listener {
         super.onStop()
     }
 
+    override fun onDestroy() {
+        avatarCache.evictAll()
+        super.onDestroy()
+    }
+
     override fun onResume() {
         super.onResume()
         applyLoginState()
@@ -387,8 +392,9 @@ class MusicActivity : AppCompatActivity(), MusicPlayer.Listener {
 
     /**
      * 统一播放入口。
-     * 流程：checkMusic（可选预检）→ songUrl → PlayQueue.setQueue → MusicPlayer.play。
-     * 任何一步失败都 Toast 提示，**不**进入播放。
+     * 流程：checkMusic（可选预检）→ songUrl → PlayQueue.setQueue → applyMiniPlayerState → MusicPlayer.play。
+     * 任何一步失败都 Toast 提示，**不**进入播放，也**不**提前更新 mini player / 队列，
+     * 避免不可播放曲目把 UI 切换到错误状态。
      */
     fun playSongFlow(song: PlayableSong, allSongs: List<PlayableSong>, startIndex: Int = allSongs.indexOf(song).coerceAtLeast(0)) {
         if (!hasServerConfig()) {
@@ -397,10 +403,6 @@ class MusicActivity : AppCompatActivity(), MusicPlayer.Listener {
         }
         val baseUrl = "http://${requireAddress()}:${requirePort()}"
         val cookie = MusicSession.cookie(this).ifBlank { null }
-
-        // 1. 先重置队列并显示新曲目（给用户即时反馈）
-        PlayQueue.setQueue(allSongs, startIndex)
-        applyMiniPlayerState(song.name, song.artist)
 
         lifecycleScope.launch {
             // step 1: 预检
@@ -412,6 +414,8 @@ class MusicActivity : AppCompatActivity(), MusicPlayer.Listener {
             if (!check.success) {
                 val msg = if (check.message.isNotBlank()) check.message else getString(R.string.music_play_song_unavailable)
                 Toast.makeText(this@MusicActivity, msg, Toast.LENGTH_SHORT).show()
+                // 预检失败：恢复 mini player 到当前已播放曲目
+                applyMiniPlayerState()
                 return@launch
             }
 
@@ -424,10 +428,16 @@ class MusicActivity : AppCompatActivity(), MusicPlayer.Listener {
             val playUrl = urlInfo?.url
             if (playUrl.isNullOrBlank()) {
                 Toast.makeText(this@MusicActivity, R.string.music_play_song_unavailable, Toast.LENGTH_SHORT).show()
+                // 拿 URL 失败：恢复 mini player 到当前已播放曲目
+                applyMiniPlayerState()
                 return@launch
             }
 
-            // step 3: 播放
+            // step 3: 预检通过后，才更新队列 + mini player
+            PlayQueue.setQueue(allSongs, startIndex)
+            applyMiniPlayerState(song.name, song.artist)
+
+            // step 4: 播放
             val dur = (if (song.durationMs > 0) song.durationMs else urlInfo.timeMs)
             MusicPlayer.play(playUrl, song.name, song.artist, dur)
         }
@@ -576,6 +586,7 @@ class MusicActivity : AppCompatActivity(), MusicPlayer.Listener {
         }
     }
 
+    // Activity-scoped 头像缓存：onDestroy 时清空，避免跨 Activity 引用。
     private val avatarCache = object : androidx.collection.LruCache<String, android.graphics.Bitmap>(4) {
         override fun sizeOf(key: String, value: android.graphics.Bitmap): Int = 1
     }

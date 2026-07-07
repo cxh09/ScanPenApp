@@ -31,11 +31,17 @@ class OpenAiClientHolder(private val configProvider: () -> ApiConfig) {
         require(current.isComplete) {
             "ApiConfig is incomplete: API Key and Model are required"
         }
+        // 快速路径：缓存命中
         cached?.let { (cfg, client) ->
             if (cfg == current) return client
         }
-        val fresh = buildClient(current).also { cached = current to it }
-        return fresh
+        // 慢速路径：加锁后二次检查 + 重新构建
+        synchronized(this) {
+            cached?.let { (cfg, client) ->
+                if (cfg == current) return client
+            }
+            return buildClient(current).also { cached = current to it }
+        }
     }
 
     private fun buildClient(config: ApiConfig): OpenAI {

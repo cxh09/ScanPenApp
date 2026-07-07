@@ -109,9 +109,10 @@ class AiSettingsActivity : AppCompatActivity() {
         binding.btnPresetOpencode.setOnClickListener {
             binding.etBaseUrl.setText("https://opencode.ai/zen/go/v1")
         }
-        // 智谱 GLM 免费一键预设：填齐当前编辑配置的 Key/BaseURL/Model
+        // 智谱 GLM 一键预设：仅填入公开的 BaseURL/Model，API Key 字段留空，
+        // 由用户在 etApiKey（带 ai_settings_api_key_hint 占位）中自行填入。
         binding.btnPresetGlm.setOnClickListener {
-            binding.etApiKey.setText("f8be67658e91407eaf703a92e0e1e325.ULwVYUtaToi2AJj0")
+            binding.etApiKey.setText("")
             binding.etBaseUrl.setText("https://open.bigmodel.cn/api/paas/v4")
             binding.etModel.setText("GLM-4.7-Flash")
             binding.tvTestStatus.text = ""

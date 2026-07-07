@@ -67,6 +67,12 @@ object MusicPlayer {
     private var currentArtist: String = ""
     private var currentDurationMs: Long = 0L
 
+    // 缓存最近一次 play 的入参,供 REPEAT_ONE 模式在 OnCompletion 后自动续播使用。
+    private var lastUrl: String = ""
+    private var lastTitle: String = ""
+    private var lastArtist: String = ""
+    private var lastDurationMs: Long = 0L
+
     private val listeners = CopyOnWriteArraySet<Listener>()
 
     /** prepare 超时任务；触发后 stop + onError。 */
@@ -152,6 +158,11 @@ object MusicPlayer {
             currentTitle = title
             currentArtist = artist
             currentDurationMs = durationMs
+            // 记录最近一次播放入参,REPEAT_ONE 模式下 OnCompletion 触发时会用这一组值续播。
+            lastUrl = url
+            lastTitle = title
+            lastArtist = artist
+            lastDurationMs = durationMs
             state = State.PREPARING
             notifyStateChanged()
             val p = MediaPlayer()
@@ -173,9 +184,21 @@ object MusicPlayer {
                 }
                 p.setOnCompletionListener {
                     mainHandler.removeCallbacks(positionLoopRunnable)
-                    state = State.IDLE
-                    notifyStateChanged()
-                    notifyCompletion()
+                    if (PlayQueue.mode() == PlayQueue.Mode.REPEAT_ONE && lastUrl.isNotEmpty()) {
+                        // 单曲循环:在主线程重新调用 play() 续播同一首,
+                        // 不切到 IDLE,也不发 onCompletion,UI 保持 PLAYING 持续。
+                        val replayUrl = lastUrl
+                        val replayTitle = lastTitle
+                        val replayArtist = lastArtist
+                        val replayDurationMs = lastDurationMs
+                        mainHandler.post {
+                            play(replayUrl, replayTitle, replayArtist, replayDurationMs)
+                        }
+                    } else {
+                        state = State.IDLE
+                        notifyStateChanged()
+                        notifyCompletion()
+                    }
                 }
                 p.setOnErrorListener { _, what, extra ->
                     mainHandler.removeCallbacks(prepareTimeoutRunnable)

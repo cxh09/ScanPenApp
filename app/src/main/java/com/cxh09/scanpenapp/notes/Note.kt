@@ -24,9 +24,10 @@ data class Note(
      * 用于列表项预览的纯文本摘要：去除 HTML tag 后按空白折行，最后截断到 200 字。
      * 不在 UI 主线程做长文本扫描（短摘要 200 字内可接受）。
      */
-    val contentSnippet: String
-        get() {
-            if (contentHtml.isEmpty()) return ""
+    val contentSnippet: String by lazy {
+        if (contentHtml.isEmpty()) {
+            ""
+        } else {
             val text = contentHtml
                 .replace(Regex("<[^>]+>"), " ")
                 .replace("&nbsp;", " ")
@@ -35,6 +36,7 @@ data class Note(
                 .replace("&gt;", ">")
                 .replace(Regex("\\s+"), " ")
                 .trim()
-            return if (text.length > 200) text.substring(0, 200) else text
+            if (text.length > 200) text.substring(0, 200) else text
         }
+    }
 }

@@ -23,10 +23,10 @@ object LrcParser {
      * - f: 1~3 位（毫秒 / 厘秒）
      * - 分隔符：`.` 或 `:`
      */
-    private val lineRegex = Regex("""\[(\d{1,2}):(\d{1,2})[.:](\d{1,3})]""")
+    private val lineRegex = Regex("""\[(\d{1,2}):(\d{1,2})[.:](\d{1,3})\]""")
 
     /** 元数据行正则：`[ti:xxx]` / `[ar:xxx]` 等。 */
-    private val metaRegex = Regex("""^\[(ti|ar|al|by|offset|length):.*]""", RegexOption.IGNORE_CASE)
+    private val metaRegex = Regex("""^\[(ti|ar|al|by|offset|length):.*\]""", RegexOption.IGNORE_CASE)
 
     /**
      * 解析 LRC 字符串为 [LrcLine] 列表。

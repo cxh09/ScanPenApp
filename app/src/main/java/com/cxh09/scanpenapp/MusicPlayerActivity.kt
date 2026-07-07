@@ -312,7 +312,9 @@ class MusicPlayerActivity : AppCompatActivity(), MusicPlayer.Listener {
 
     /**
      * 走完整播放流程（预检 + 拿 URL + 播放）。
-     * 与 [com.cxh09.scanpenapp.MusicActivity.playSongFlow] 行为一致；这里简化为只调内部方法。
+     * 与 [com.cxh09.scanpenapp.MusicActivity.playSongFlow] 行为一致；
+     * **先通过预检再更新 UI**（队列、标题、歌词），避免不可播放曲目把播放页
+     * 切换到错误状态。
      */
     private fun playSongFlow(song: PlayableSong, allSongs: List<PlayableSong>, startIndex: Int) {
         val baseUrl = currentBaseUrl() ?: run {
@@ -320,14 +322,6 @@ class MusicPlayerActivity : AppCompatActivity(), MusicPlayer.Listener {
             return
         }
         val cookie = MusicSession.cookie(this).ifBlank { null }
-        PlayQueue.setQueue(allSongs, startIndex)
-        loadedLrcForSongId = null
-        lrcLines = emptyList()
-        renderLyricLines()
-        // 渲染目标歌曲信息
-        binding.tvSongName.text = song.name
-        binding.tvArtistName.text = song.artist
-        binding.tvCoverInitial.text = song.name.firstOrNull()?.toString() ?: "♪"
         lifecycleScope.launch {
             val check = try {
                 withContext(Dispatchers.IO) { MusicApi.checkMusic(baseUrl, cookie, song.id, br = 320000) }
@@ -340,6 +334,8 @@ class MusicPlayerActivity : AppCompatActivity(), MusicPlayer.Listener {
                     check.message.ifBlank { getString(R.string.music_play_song_unavailable) },
                     Toast.LENGTH_SHORT
                 ).show()
+                // 预检失败：恢复播放页到当前已播放曲目
+                renderCurrentSong()
                 return@launch
             }
             val songUrl = try {
@@ -354,8 +350,20 @@ class MusicPlayerActivity : AppCompatActivity(), MusicPlayer.Listener {
                     R.string.music_play_song_unavailable,
                     Toast.LENGTH_SHORT
                 ).show()
+                // 拿 URL 失败：恢复播放页到当前已播放曲目
+                renderCurrentSong()
                 return@launch
             }
+
+            // 预检通过后，才更新队列、标题、歌词
+            PlayQueue.setQueue(allSongs, startIndex)
+            loadedLrcForSongId = null
+            lrcLines = emptyList()
+            renderLyricLines()
+            binding.tvSongName.text = song.name
+            binding.tvArtistName.text = song.artist
+            binding.tvCoverInitial.text = song.name.firstOrNull()?.toString() ?: "♪"
+
             val dur = (if (song.durationMs > 0) song.durationMs else songUrl.timeMs)
             MusicPlayer.play(url, song.name, song.artist, dur)
         }

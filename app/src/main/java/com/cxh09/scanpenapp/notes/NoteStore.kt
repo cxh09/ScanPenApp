@@ -89,8 +89,9 @@ class NoteStore(context: Context) {
     fun deleteNote(id: Long): Boolean {
         return try {
             val list = readAll()
-            val target = list.firstOrNull { it.id == id } ?: return false
-            // 1. 删除图片物理文件
+            val exists = list.any { it.id == id }
+            if (!exists) return false
+            // 1. 删除图片物理文件（清理该 id 对应的所有图片）
             val prefix = "${id}_"
             imagesDir.listFiles()?.forEach { f ->
                 if (f.isFile && f.name.startsWith(prefix)) {
@@ -98,7 +99,7 @@ class NoteStore(context: Context) {
                 }
             }
             // 2. 移除条目
-            val filtered = list.filterNot { it.id == target.id }
+            val filtered = list.filterNot { it.id == id }
             writeAll(filtered)
             true
         } catch (_: Exception) {
